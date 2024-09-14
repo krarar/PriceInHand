@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام الشراء - المتجر الحديث المطور</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1abc9c;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --background-color: #f5f7fa;
+            --text-color: #2c3e50;
+            --card-background: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .checkout-form {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+
+        .checkout-form h2, .checkout-form h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .checkout-form input,
+        .checkout-form select,
+        .checkout-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .checkout-form input:focus,
+        .checkout-form select:focus,
+        .checkout-form textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .checkout-form button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .checkout-form button:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .order-summary {
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .size-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .size-option {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-grow: 1;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .size-option.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .size-input {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .color-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--primary-color);
+        }
+
+        .color-option::after {
+            content: attr(data-color);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        @media screen and (max-width: 768px) {
+            .checkout-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>إتمام الشراء</h1>
+    </div>
+
+    <div class="checkout-form">
+        <h2>معلومات الشحن</h2>
+        <input type="text" id="fullName" placeholder="الاسم الكامل" required>
+        <input type="text" id="address" placeholder="العنوان" required>
+        <input type="tel" id="phone" placeholder="رقم الهاتف" required>
+        <input type="tel" id="alternativePhone" placeholder="رقم الهاتف البديل">
+        
+        <h3>اختر المقاس بالأحرف</h3>
+        <div class="size-picker" id="letterSizePicker">
+            <div class="size-option" data-size="S">S</div>
+            <div class="size-option" data-size="M">M</div>
+            <div class="size-option" data-size="L">L</div>
+            <div class="size-option" data-size="XL">XL</div>
+            <div class="size-option" data-size="2XL">2XL</div>
+            <div class="size-option" data-size="3XL">3XL</div>
+            <div class="size-option" data-size="4XL">4XL</div>
+            <div class="size-option" data-size="5XL">5XL</div>
+            <div class="size-option" data-size="أخرى">أخرى</div>
+        </div>
+        <input type="text" id="customLetterSize" class="size-input" placeholder="أدخل المقاس المخصص">
+
+        <h3>اختر المقاس بالأرقام</h3>
+        <div class="size-picker" id="numberSizePicker">
+            <div class="size-option" data-size="18">18</div>
+            <div class="size-option" data-size="20">20</div>
+            <div class="size-option" data-size="22">22</div>
+            <div class="size-option" data-size="24">24</div>
+            <div class="size-option" data-size="26">26</div>
+            <div class="size-option" data-size="28">28</div>
+            <div class="size-option" data-size="30">30</div>
+            <div class="size-option" data-size="أخرى">أخرى</div>
+        </div>
+        <input type="number" id="customNumberSize" class="size-input" placeholder="أدخل المقاس المخصص" min="18" max="50">
+
+        <h3>اختر اللون</h3>
+        <div class="color-picker" id="colorPicker">
+            <div class="color-option" style="background-color: #ff0000;" data-color="أحمر"></div>
+            <div class="color-option" style="background-color: #00ff00;" data-color="أخضر"></div>
+            <div class="color-option" style="background-color: #0000ff;" data-color="أزرق"></div>
+            <div class="color-option" style="background-color: #ffff00;" data-color="أصفر"></div>
+            <div class="color-option" style="background-color: #ff00ff;" data-color="وردي"></div>
+            
+            <div class="color-option" style="background-color: #0e0d0d;" data-color="أحمر"></div>
+            <div class="color-option" style="background-color: #0af8e4;" data-color="أخضر"></div>
+            <div class="color-option" style="background-color: #690a59;" data-color="أزرق"></div>
+            <div class="color-option" style="background-color: #370d9b;" data-color="أصفر"></div>
+            <div class="color-option" style="background-color: #f07909;" data-color="وردي"></div>
+        </div>
+
+        <h3>ملاحظات إضافية للطلب</h3>
+        <textarea id="orderNotes" placeholder="أضف أي ملاحظات أو تعليمات خاصة لطلبك هنا"></textarea>
+
+        <div class="order-summary">
+            <h3>ملخص الطلب</h3>
+            <div id="orderItems"></div>
+            <p>المجموع: <span id="totalPrice">0</span> دولار</p>
+        </div>
+
+        <button onclick="submitOrder()">تأكيد الطلب</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
+            authDomain: "messageemeapp.firebaseapp.com",
+            databaseURL: "https://messageemeapp-default-rtdb.firebaseio.com",
+            projectId: "messageemeapp",
+            storageBucket: "messageemeapp.appspot.com",
+            messagingSenderId: "255034474844",
+            appId: "1:255034474844:web:5e3b7a6bc4b2fb94cc4199"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let userId = localStorage.getItem('userId');
+        if (!userId) {
+            userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('userId', userId);
+        }
+
+        let selectedColor = '';
+        let selectedLetterSize = '';
+        let selectedNumberSize = '';
+
+        // تحديث دالة loadCartItems
+function loadCartItems() {
+    const orderItemsContainer = document.getElementById('orderItems');
+    let total = 0;
+
+    database.ref('carts/' + userId).once('value', (snapshot) => {
+        const cart = snapshot.val();
+        if (cart) {
+            for (let productId in cart) {
+                const cartItem = cart[productId];
+                const itemTotal = cartItem.price;
+                total += itemTotal;
+
+                const imageOptions = cartItem.images.map((img, index) => 
+                    `<option value="${img}">صورة ${index + 1}</option>`
+                ).join('');
+
+                orderItemsContainer.innerHTML += `
+                    <div class="order-item" data-product-id="${productId}">
+                        <img src="${cartItem.images[0]}" alt="${cartItem.name}" style="width: 50px; height: 50px;" class="product-image">
+                        <span>${cartItem.name}</span>
+                        <div>
+                            <p>السعر المختار: $${cartItem.price.toFixed(2)}</p>
+                            <p>السعر الأصلي: $${cartItem.priceOriginal}</p>
+                            <p>سعر الخصم: $${cartItem.priceDiscount}</p>
+                            <p>سعر الخصم الفائق: $${cartItem.priceSuperDiscount}</p>
+                        </div>
+                        <select class="image-selector" onchange="updateProductImage(this, '${productId}')">
+                            <option value="">اختر صورة</option>
+                            ${imageOptions}
+                        </select>
+                    </div>
+                `;
+            }
+            document.getElementById('totalPrice').textContent = total.toFixed(2);
+        }
+    });
+}
+// دالة جديدة لتحديث صورة المنتج
+function updateProductImage(selectElement, productId) {
+    const selectedImage = selectElement.value;
+    const productContainer = selectElement.closest('.order-item');
+    const imageElement = productContainer.querySelector('.product-image');
+    imageElement.src = selectedImage;
+
+    // تحديث الصورة المختارة في قاعدة البيانات
+    database.ref(`carts/${userId}/${productId}/selectedImage`).set(selectedImage);
+}
+
+     // تحديث دالة submitOrder
+function submitOrder() {
+    const fullName = document.getElementById('fullName').value;
+    const address = document.getElementById('address').value;
+    const phone = document.getElementById('phone').value;
+    const alternativePhone = document.getElementById('alternativePhone').value;
+    const orderNotes = document.getElementById('orderNotes').value;
+
+    if (!fullName || !address || !phone || !selectedColor || (!selectedLetterSize && !selectedNumberSize)) {
+        alert('الرجاء ملء جميع الحقول المطلوبة واختيار المقاس واللون');
+        return;
+    }
+
+    database.ref('carts/' + userId).once('value', (snapshot) => {
+        const cart = snapshot.val();
+        if (cart) {
+            const orderItems = {};
+            for (let productId in cart) {
+                orderItems[productId] = {
+                    ...cart[productId],
+                    selectedImage: cart[productId].selectedImage || cart[productId].images[0]
+                };
+            }
+
+            const orderData = {
+                fullName,
+                address,
+                phone,
+                alternativePhone,
+                letterSize: selectedLetterSize,
+                numberSize: selectedNumberSize,
+                color: selectedColor,
+                orderNotes,
+                userId,
+                orderDate: new Date().toISOString(),
+                status: 'pending',
+                items: orderItems
+            };
+
+            database.ref('orders').push(orderData, (error) => {
+                if (error) {
+                    alert('حدث خطأ أثناء إرسال الطلب. الرجاء المحاولة مرة أخرى.');
+                } else {
+                    alert('تم إرسال طلبك بنجاح!');
+                    database.ref('carts/' + userId).remove();
+                    window.location.href = 'updated-store-code.html';
+                }
+            });
+        } else {
+            alert('السلة فارغة. الرجاء إضافة منتجات قبل إتمام الشراء.');
+        }
+    });
+}
+
+        // إعداد اختيار اللون
+        const colorOptions = document.querySelectorAll('.color-option');
+        colorOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                colorOptions.forEach(op => op.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedColor = this.getAttribute('data-color');
+            });
+        });
+
+        // إعداد اختيار المقاس بالأحرف
+        const letterSizeOptions = document.querySelectorAll('#letterSizePicker .size-option');
+        const customLetterSizeInput = document.getElementById('customLetterSize');
+        letterSizeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                letterSizeOptions.forEach(op => op.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedLetterSize = this.getAttribute('data-size');
+                if (selectedLetterSize === 'أخرى') {
+                    customLetterSizeInput.style.display = 'block';
+                    selectedLetterSize = '';
+                } else {
+                    customLetterSizeInput.style.display = 'none';
+                }
+            });
+        });
+
+        customLetterSizeInput.addEventListener('input', function() {
+            selectedLetterSize = this.value;
+        });
+
+        // إعداد اختيار المقاس بالأرقام
+        const numberSizeOptions = document.querySelectorAll('#numberSizePicker .size-option');
+        const customNumberSizeInput = document.getElementById('customNumberSize');
+        numberSizeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                numberSizeOptions.forEach(op => op.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedNumberSize = this.getAttribute('data-size');
+                if (selectedNumberSize === 'أخرى') {
+                    customNumberSizeInput.style.display = 'block';
+                    selectedNumberSize = '';
+                } else {
+                    customNumberSizeInput.style.display = 'none';
+                }
+            });
+        });
+
+        customNumberSizeInput.addEventListener('input', function() {
+            selectedNumberSize = this.value;
+        });
+
+        window.onload = loadCartItems;
+    </script>
+</body>
+</html>
