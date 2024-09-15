@@ -163,6 +163,47 @@
                 padding: 20px;
             }
         }
+        
+        .product-details {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-left: 15px;
+            border-radius: 5px;
+        }
+
+        .product-info {
+            flex-grow: 1;
+        }
+
+        .selected-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .selected-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -224,9 +265,38 @@
             });
         }
 
-        function createOrderElement(orderId, order, isNewOrder) {
+       function createOrderElement(orderId, order, isNewOrder) {
             const orderDiv = document.createElement('div');
             orderDiv.className = `order-item ${isNewOrder ? 'new-order' : ''}`;
+            
+            let productDetailsHTML = '';
+            if (order.items) {
+                productDetailsHTML = '<div class="product-details">';
+                for (const [productId, product] of Object.entries(order.items)) {
+                    productDetailsHTML += `
+                        <div class="product-item">
+                            <img src="${product.images[0]}" alt="${product.name}" class="product-image">
+                            <div class="product-info">
+                                <p><strong>${product.name}</strong></p>
+                                <p>السعر: $${product.price.toFixed(2)}</p>
+                                <p>السعر الأصلي: $${product.priceOriginal}</p>
+                                <p>سعر الخصم: $${product.priceDiscount}</p>
+                                <p>سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (product.selectedImages && product.selectedImages.length > 0) {
+                        productDetailsHTML += '<div class="selected-images">';
+                        product.selectedImages.forEach(img => {
+                            productDetailsHTML += `<img src="${img}" alt="صورة محددة" class="selected-image">`;
+                        });
+                        productDetailsHTML += '</div>';
+                    }
+                }
+                productDetailsHTML += '</div>';
+            }
+
             orderDiv.innerHTML = `
                 <div class="order-header">
                     <span class="order-id">رقم الطلب: ${orderId}</span>
@@ -241,6 +311,7 @@
                     <p><strong>المقاس بالأرقام:</strong> ${order.numberSize || 'غير محدد'}</p>
                     <p><strong>اللون:</strong> ${order.color}</p>
                     ${order.orderNotes ? `<div class="order-notes"><strong>ملاحظات:</strong> ${order.orderNotes}</div>` : ''}
+                    ${productDetailsHTML}
                 </div>
                 <div class="order-status">
                     <span class="status-label">الحالة:</span>
@@ -256,29 +327,6 @@
                 </div>
             `;
             return orderDiv;
-        }
-
-        function updateOrderStatus(orderId) {
-            const newStatus = document.getElementById(`status-${orderId}`).value;
-            database.ref(`orders/${orderId}`).update({ status: newStatus }, (error) => {
-                if (error) {
-                    alert('حدث خطأ أثناء تحديث حالة الطلب');
-                } else {
-                    alert('تم تحديث حالة الطلب بنجاح');
-                }
-            });
-        }
-
-        function deleteOrder(orderId) {
-            if (confirm('هل أنت متأكد من رغبتك في حذف هذا الطلب؟')) {
-                database.ref(`orders/${orderId}`).remove((error) => {
-                    if (error) {
-                        alert('حدث خطأ أثناء حذف الطلب');
-                    } else {
-                        alert('تم حذف الطلب بنجاح');
-                    }
-                });
-            }
         }
 
         window.onload = loadOrders;
