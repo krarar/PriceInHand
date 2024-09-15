@@ -191,7 +191,10 @@
 <body>
     <div class="header">
         <h1>إتمام الشراء</h1>
+        <div id="productImagesContainer"></div>
+
     </div>
+    
 
     <div class="checkout-form">
         <h2>معلومات الشحن</h2>
@@ -282,43 +285,46 @@
         let selectedNumberSize = '';
 
         // تحديث دالة loadCartItems
-function loadCartItems() {
-    const orderItemsContainer = document.getElementById('orderItems');
-    let total = 0;
-
-    database.ref('carts/' + userId).once('value', (snapshot) => {
-        const cart = snapshot.val();
-        if (cart) {
-            for (let productId in cart) {
-                const cartItem = cart[productId];
-                const itemTotal = cartItem.price;
-                total += itemTotal;
-
-                const imageOptions = cartItem.images.map((img, index) => 
-                    `<option value="${img}">صورة ${index + 1}</option>`
-                ).join('');
-
-                orderItemsContainer.innerHTML += `
-                    <div class="order-item" data-product-id="${productId}">
-                        <img src="${cartItem.images[0]}" alt="${cartItem.name}" style="width: 50px; height: 50px;" class="product-image">
-                        <span>${cartItem.name}</span>
-                        <div>
-                            <p>السعر المختار: $${cartItem.price.toFixed(2)}</p>
-                            <p>السعر الأصلي: $${cartItem.priceOriginal}</p>
-                            <p>سعر الخصم: $${cartItem.priceDiscount}</p>
-                            <p>سعر الخصم الفائق: $${cartItem.priceSuperDiscount}</p>
-                        </div>
-                        <select class="image-selector" onchange="updateProductImage(this, '${productId}')">
-                            <option value="">اختر صورة</option>
-                            ${imageOptions}
-                        </select>
-                    </div>
-                `;
-            }
-            document.getElementById('totalPrice').textContent = total.toFixed(2);
+        function loadCartItems() {
+            const orderItemsContainer = document.getElementById('orderItems');
+            let total = 0;
+        
+            database.ref('carts/' + userId).once('value', (snapshot) => {
+                const cart = snapshot.val();
+                if (cart) {
+                    for (let productId in cart) {
+                        const cartItem = cart[productId];
+                        const itemTotal = cartItem.price;
+                        total += itemTotal;
+        
+                        const imageOptions = cartItem.images.map((img, index) => 
+                            `<label>
+                                <input type="checkbox" name="productImages" value="${img}">
+                                <img src="${img}" alt="صورة ${index + 1}" style="width: 50px; height: 50px;">
+                            </label>`
+                        ).join('');
+        
+                        orderItemsContainer.innerHTML += `
+                            <div class="order-item" data-product-id="${productId}">
+                                <img src="${cartItem.images[0]}" alt="${cartItem.name}" style="width: 50px; height: 50px;" class="product-image">
+                                <span>${cartItem.name}</span>
+                                <div>
+                                    <p>السعر المختار: $${cartItem.price.toFixed(2)}</p>
+                                    <p>السعر الأصلي: $${cartItem.priceOriginal}</p>
+                                    <p>سعر الخصم: $${cartItem.priceDiscount}</p>
+                                    <p>سعر الخصم الفائق: $${cartItem.priceSuperDiscount}</p>
+                                </div>
+                                <div id="productImagesContainer">
+                                    ${imageOptions}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    document.getElementById('totalPrice').textContent = total.toFixed(2);
+                }
+            });
         }
-    });
-}
+        
 // دالة جديدة لتحديث صورة المنتج
 function updateProductImage(selectElement, productId) {
     const selectedImage = selectElement.value;
@@ -331,59 +337,67 @@ function updateProductImage(selectElement, productId) {
 }
 
      // تحديث دالة submitOrder
-function submitOrder() {
-    const fullName = document.getElementById('fullName').value;
-    const address = document.getElementById('address').value;
-    const phone = document.getElementById('phone').value;
-    const alternativePhone = document.getElementById('alternativePhone').value;
-    const orderNotes = document.getElementById('orderNotes').value;
-
-    if (!fullName || !address || !phone || !selectedColor || (!selectedLetterSize && !selectedNumberSize)) {
-        alert('الرجاء ملء جميع الحقول المطلوبة واختيار المقاس واللون');
-        return;
-    }
-
-    database.ref('carts/' + userId).once('value', (snapshot) => {
-        const cart = snapshot.val();
-        if (cart) {
-            const orderItems = {};
-            for (let productId in cart) {
-                orderItems[productId] = {
-                    ...cart[productId],
-                    selectedImage: cart[productId].selectedImage || cart[productId].images[0]
-                };
-            }
-
-            const orderData = {
-                fullName,
-                address,
-                phone,
-                alternativePhone,
-                letterSize: selectedLetterSize,
-                numberSize: selectedNumberSize,
-                color: selectedColor,
-                orderNotes,
-                userId,
-                orderDate: new Date().toISOString(),
-                status: 'pending',
-                items: orderItems
-            };
-
-            database.ref('orders').push(orderData, (error) => {
-                if (error) {
-                    alert('حدث خطأ أثناء إرسال الطلب. الرجاء المحاولة مرة أخرى.');
-                } else {
-                    alert('تم إرسال طلبك بنجاح!');
-                    database.ref('carts/' + userId).remove();
-                    window.location.href = 'updated-store-code.html';
-                }
-            });
-        } else {
-            alert('السلة فارغة. الرجاء إضافة منتجات قبل إتمام الشراء.');
+     function submitOrder() {
+        const fullName = document.getElementById('fullName').value;
+        const address = document.getElementById('address').value;
+        const phone = document.getElementById('phone').value;
+        const alternativePhone = document.getElementById('alternativePhone').value;
+        const orderNotes = document.getElementById('orderNotes').value;
+    
+        // جمع الصور المختارة
+        const selectedImages = Array.from(document.querySelectorAll('input[name="productImages"]:checked')).map(img => img.value);
+    
+        if (!fullName || !address || !phone || !selectedColor || (!selectedLetterSize && !selectedNumberSize)) {
+            alert('الرجاء ملء جميع الحقول المطلوبة واختيار المقاس واللون');
+            return;
         }
-    });
-}
-
+    
+        if (selectedImages.length === 0) {
+            alert('الرجاء اختيار صورة واحدة على الأقل');
+            return;
+        }
+    
+        database.ref('carts/' + userId).once('value', (snapshot) => {
+            const cart = snapshot.val();
+            if (cart) {
+                const orderItems = {};
+                for (let productId in cart) {
+                    orderItems[productId] = {
+                        ...cart[productId],
+                        selectedImages: selectedImages // الصور المختارة
+                    };
+                }
+    
+                const orderData = {
+                    fullName,
+                    address,
+                    phone,
+                    alternativePhone,
+                    letterSize: selectedLetterSize,
+                    numberSize: selectedNumberSize,
+                    color: selectedColor,
+                    orderNotes,
+                    userId,
+                    orderDate: new Date().toISOString(),
+                    status: 'pending',
+                    items: orderItems
+                };
+    
+                database.ref('orders').push(orderData, (error) => {
+                    if (error) {
+                        alert('حدث خطأ أثناء إرسال الطلب. الرجاء المحاولة مرة أخرى.');
+                    } else {
+                        alert('تم إرسال طلبك بنجاح!');
+                        database.ref('carts/' + userId).remove();
+                        window.location.href = 'updated-store-code.html';
+                    }
+                });
+            } else {
+                alert('السلة فارغة. الرجاء إضافة منتجات قبل إتمام الشراء.');
+            }
+        });
+    }
+    
         // إعداد اختيار اللون
         const colorOptions = document.querySelectorAll('.color-option');
         colorOptions.forEach(option => {
