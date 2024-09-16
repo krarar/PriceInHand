@@ -231,6 +231,7 @@
         </div>
     </div>
 
+    
     <script>
         // تحقق ما إذا كان المستخدم قد شاهد الشاشات الترحيبية
         window.onload = function() {
@@ -252,12 +253,15 @@
             } else if (screenNumber === 2) {
                 document.getElementById('screen2').classList.add('active');
             } else {
-                // اكتمال الشاشات
+                // اكتمال الشاشات: إعادة توجيه المستخدم إلى صفحة التسجيل أو التسوق
                 localStorage.setItem('welcomeScreenShown', 'true');
-                document.querySelectorAll('.welcome-screen').forEach(screen => {
-                    screen.style.display = 'none';
-                });
+                startShopping();
             }
+        }
+
+        // إعادة توجيه المستخدم إلى صفحة التسجيل أو التسوق
+        function startShopping() {
+            window.location.href = "index1.html";  // يتم توجيه المستخدم إلى الصفحة index1.html
         }
     </script>
 </body>
