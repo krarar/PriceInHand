@@ -231,8 +231,7 @@
             <img src="https://lh3.googleusercontent.com/a/ACg8ocI6GS6JwgEqUzq1arsBk2qjlkKItXFcNV5QPsM__WmW5h_GV0V3=s864-c-no" alt="شراء المنتجات" class="screen-image">
             <h2>تسوق بثقة وأمان</h2>
             <p>اختر منتجاتك المفضلة وقم بإتمام عملية الشراء بسهولة وسرعة مع ضمان أمان معلوماتك.</p>
-          <button class="btn" onclick="startShopping()">ابدأ التسوق <i class="fas fa-shopping-cart"></i></button>
-
+            <button class="btn" onclick="finishWelcome()">ابدأ التسوق <i class="fas fa-shopping-cart"></i></button>
         </div>
         <div>
             <div class="progress-bar">
@@ -251,6 +250,15 @@
         let currentScreen = 1;
         const totalScreens = 3;
 
+        function checkWelcomeStatus() {
+            const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+            if (hasSeenWelcome) {
+                startShopping();
+            } else {
+                showScreen(1);
+            }
+        }
+
         function showScreen(screenNumber) {
             const screens = document.querySelectorAll('.welcome-screen');
             screens.forEach(screen => screen.classList.remove('active'));
@@ -265,14 +273,18 @@
                 bar.style.width = `${progress}%`;
             });
         }
-       
-          function startShopping() {
-        window.location.href = "index1.html";  // يتم توجيه المستخدم إلى الصفحة index.html
-    }
-       
-       
-       
-       
+
+        function finishWelcome() {
+            localStorage.setItem('hasSeenWelcome', 'true');
+            startShopping();
+        }
+
+        function startShopping() {
+            window.location.href = "index1.html";
+        }
+
+        // عند تحميل الصفحة، تحقق من حالة الترحيب
+        window.onload = checkWelcomeStatus;
     </script>
 </body>
 </html>
