@@ -5,14 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تطبيق التسوق الحديث</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737">
-    <meta name="apple-mobile-web-app-status-bar" content="#db4938">
-    <meta name="theme-color" content="#db4938">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
-
+        
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #34c759;
@@ -191,7 +186,7 @@
     </style>
 </head>
 <body>
-    <div id="screen1" class="welcome-screen">
+    <div id="screen1" class="welcome-screen active">
         <div class="content-wrapper">
             <img src="https://lh3.googleusercontent.com/a/ACg8ocI6GS6JwgEqUzq1arsBk2qjlkKItXFcNV5QPsM__WmW5h_GV0V3=s864-c-no" alt="شعار التطبيق" class="logo">
             <h1>مرحبًا بك في تطبيق التسوق الحديث</h1>
@@ -231,38 +226,53 @@
         </div>
     </div>
 
-    
+    <div id="screen3" class="welcome-screen">
+        <div class="content-wrapper">
+            <img src="https://lh3.googleusercontent.com/a/ACg8ocI6GS6JwgEqUzq1arsBk2qjlkKItXFcNV5QPsM__WmW5h_GV0V3=s864-c-no" alt="شراء المنتجات" class="screen-image">
+            <h2>تسوق بثقة وأمان</h2>
+            <p>اختر منتجاتك المفضلة وقم بإتمام عملية الشراء بسهولة وسرعة مع ضمان أمان معلوماتك.</p>
+          <button class="btn" onclick="startShopping()">ابدأ التسوق <i class="fas fa-shopping-cart"></i></button>
+
+        </div>
+        <div>
+            <div class="progress-bar">
+                <div class="progress" style="width: 75%;"></div>
+            </div>
+            <div class="social-icons">
+                <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // تحقق ما إذا كان المستخدم قد شاهد الشاشات الترحيبية
-        window.onload = function() {
-            if (localStorage.getItem('welcomeScreenShown')) {
-                document.querySelectorAll('.welcome-screen').forEach(screen => {
-                    screen.style.display = 'none';
-                });
-            } else {
-                document.getElementById('screen1').classList.add('active');
-            }
-        };
+        let currentScreen = 1;
+        const totalScreens = 3;
 
         function showScreen(screenNumber) {
-            document.querySelectorAll('.welcome-screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            if (screenNumber === 1) {
-                document.getElementById('screen1').classList.add('active');
-            } else if (screenNumber === 2) {
-                document.getElementById('screen2').classList.add('active');
-            } else {
-                // اكتمال الشاشات: إعادة توجيه المستخدم إلى صفحة التسجيل أو التسوق
-                localStorage.setItem('welcomeScreenShown', 'true');
-                startShopping();
-            }
+            const screens = document.querySelectorAll('.welcome-screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+            document.getElementById(`screen${screenNumber}`).classList.add('active');
+            currentScreen = screenNumber;
+            updateProgress();
         }
 
-        // إعادة توجيه المستخدم إلى صفحة التسجيل أو التسوق
-        function startShopping() {
-            window.location.href = "index1.html";  // يتم توجيه المستخدم إلى الصفحة index1.html
+        function updateProgress() {
+            const progress = (currentScreen / totalScreens) * 100;
+            document.querySelectorAll('.progress').forEach(bar => {
+                bar.style.width = `${progress}%`;
+            });
         }
+       
+          function startShopping() {
+        window.location.href = "index1.html";  // يتم توجيه المستخدم إلى الصفحة index.html
+    }
+       
+       
+       
+       
     </script>
 </body>
 </html>
