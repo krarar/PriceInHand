@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام الشراء - المتجر الحديث المطور</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737">
+    <meta name="apple-mobile-web-app-status-bar" content="#db4938">
+    <meta name="theme-color" content="#db4938">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --primary-color: #1abc9c;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --background-color: #f5f7fa;
+            --text-color: #2c3e50;
+            --card-background: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .checkout-form {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+
+        .checkout-form h2, .checkout-form h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .checkout-form input,
+        .checkout-form select,
+        .checkout-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .checkout-form input:focus,
+        .checkout-form select:focus,
+        .checkout-form textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .checkout-form button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .checkout-form button:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .order-summary {
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .size-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .size-option {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-grow: 1;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .size-option.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .size-input {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .product-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .product-image.selected {
+            border: 3px solid var(--primary-color);
+        }
+
+        @media screen and (max-width: 768px) {
+            .checkout-form {
+                padding: 20px;
+            }
+        }
+        
+           .product-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .product-image.selected {
+            border: 3px solid var(--primary-color);
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>إتمام الشراء</h1>
+    </div>
+
+    <div class="checkout-form">
+        <h2>معلومات الشحن</h2>
+        <input type="text" id="fullName" placeholder="الاسم الكامل" required>
+        <select id="country" required>
+            <option value="">اختر البلد</option>
+            <option value="العراق">العراق</option>
+            <option value="مصر">مصر</option>
+            <option value="السعودية">السعودية</option>
+            <option value="الإمارات">الإمارات</option>
+            <option value="الأردن">الأردن</option>
+            <!-- يمكن إضافة المزيد من البلدان العربية هنا -->
+        </select>
+        <select id="province" required>
+            <option value="">اختر المحافظة</option>
+            <!-- سيتم ملء هذه القائمة ديناميكيًا بناءً على البلد المختار -->
+        </select>
+        <input type="text" id="address" placeholder="العنوان التفصيلي" required>
+        <input type="tel" id="phone" placeholder="رقم الهاتف" required>
+        <input type="tel" id="alternativePhone" placeholder="رقم الهاتف البديل">
+        
+        <h3>اختر المقاس بالأحرف</h3>
+        <div class="size-picker" id="letterSizePicker">
+            <div class="size-option" data-size="S">S</div>
+            <div class="size-option" data-size="M">M</div>
+            <div class="size-option" data-size="L">L</div>
+            <div class="size-option" data-size="XL">XL</div>
+            <div class="size-option" data-size="2XL">2XL</div>
+            <div class="size-option" data-size="3XL">3XL</div>
+            <div class="size-option" data-size="4XL">4XL</div>
+            <div class="size-option" data-size="5XL">5XL</div>
+            <div class="size-option" data-size="أخرى">أخرى</div>
+        </div>
+        <input type="text" id="customLetterSize" class="size-input" placeholder="أدخل المقاس المخصص">
+
+        <h3>اختر المقاس بالأرقام</h3>
+        <div class="size-picker" id="numberSizePicker">
+            <div class="size-option" data-size="18">18</div>
+            <div class="size-option" data-size="20">20</div>
+            <div class="size-option" data-size="22">22</div>
+            <div class="size-option" data-size="24">24</div>
+            <div class="size-option" data-size="26">26</div>
+            <div class="size-option" data-size="28">28</div>
+            <div class="size-option" data-size="30">30</div>
+            <div class="size-option" data-size="أخرى">أخرى</div>
+        </div>
+        <input type="number" id="customNumberSize" class="size-input" placeholder="أدخل المقاس المخصص" min="18" max="50">
+
+        <h3>ملاحظات إضافية للطلب</h3>
+        <textarea id="orderNotes" placeholder="أضف أي ملاحظات أو تعليمات خاصة لطلبك هنا"></textarea>
+
+        <div class="order-summary">
+            <h3>ملخص الطلب</h3>
+            <div id="orderItems"></div>
+            <p>المجموع: <span id="totalPrice">0</span> دولار</p>
+        </div>
+
+        <button onclick="submitOrder()">تأكيد الطلب</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
+            authDomain: "messageemeapp.firebaseapp.com",
+            databaseURL: "https://messageemeapp-default-rtdb.firebaseio.com",
+            projectId: "messageemeapp",
+            storageBucket: "messageemeapp.appspot.com",
+            messagingSenderId: "255034474844",
+            appId: "1:255034474844:web:5e3b7a6bc4b2fb94cc4199"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let userId = localStorage.getItem('userId');
+        if (!userId) {
+            userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('userId', userId);
+        }
+
+        let selectedLetterSize = '';
+        let selectedNumberSize = '';
+        let selectedImages = {};
+
+        // محافظات العراق
+        const iraqProvinces = [
+            'بغداد', 'البصرة', 'نينوى', 'أربيل', 'النجف', 'كربلاء', 'السليمانية', 'صلاح الدين', 'الأنبار',
+            'ديالى', 'كركوك', 'ذي قار', 'المثنى', 'واسط', 'ميسان', 'بابل', 'دهوك'
+        ];
+
+        // تحديث قائمة المحافظات بناءً على البلد المختار
+        document.getElementById('country').addEventListener('change', function() {
+            const provinceSelect = document.getElementById('province');
+            provinceSelect.innerHTML = '<option value="">اختر المحافظة</option>';
+            
+            if (this.value === 'العراق') {
+                iraqProvinces.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province;
+                    option.textContent = province;
+                    provinceSelect.appendChild(option);
+                });
+                provinceSelect.disabled = false;
+            } else {
+                provinceSelect.disabled = true;
+            }
+        });
+
+     function loadCartItems() {
+            const orderItemsContainer = document.getElementById('orderItems');
+            let total = 0;
+        
+            database.ref('carts/' + userId).once('value', (snapshot) => {
+                const cart = snapshot.val();
+                if (cart) {
+                    for (let productId in cart) {
+                        const cartItem = cart[productId];
+                        const itemTotal = cartItem.price;
+                        total += itemTotal;
+        
+                        const imageOptions = cartItem.images.map((img, index) => 
+                            `<img src="${img}" alt="صورة ${index + 1}" class="product-image" data-product-id="${productId}" data-image-index="${index}" onclick="toggleImageSelection(this)">`
+                        ).join('');
+        
+                        orderItemsContainer.innerHTML += `
+                            <div class="order-item" data-product-id="${productId}">
+                                <div class="product-info">
+                                    <span>${cartItem.name}</span>
+                                    <div>
+                                        <p>السعر المختار: $${cartItem.price.toFixed(2)}</p>
+                                        <p>السعر الأصلي: $${cartItem.priceOriginal}</p>
+                                        <p>سعر الخصم: $${cartItem.priceDiscount}</p>
+                                        <p>سعر الخصم الفائق: $${cartItem.priceSuperDiscount}</p>
+                                    </div>
+                                </div>
+                                <div class="product-images">
+                                    ${imageOptions}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    document.getElementById('totalPrice').textContent = total.toFixed(2);
+                }
+            });
+        }
+
+        function toggleImageSelection(imgElement) {
+            const productId = imgElement.getAttribute('data-product-id');
+            const imageIndex = imgElement.getAttribute('data-image-index');
+            
+            if (!selectedImages[productId]) {
+                selectedImages[productId] = [];
+            }
+            
+            if (imgElement.classList.contains('selected')) {
+                imgElement.classList.remove('selected');
+                selectedImages[productId] = selectedImages[productId].filter(index => index !== imageIndex);
+            } else {
+                imgElement.classList.add('selected');
+                selectedImages[productId].push(imageIndex);
+            }
+        }
+
+        function submitOrder() {
+            const fullName = document.getElementById('fullName').value;
+            const country = document.getElementById('country').value;
+            const province = document.getElementById('province').value;
+            const address = document.getElementById('address').value;
+            const phone = document.getElementById('phone').value;
+            const alternativePhone = document.getElementById('alternativePhone').value;
+            const orderNotes = document.getElementById('orderNotes').value;
+        
+            if (!fullName || !country || !address || !phone || (!selectedLetterSize && !selectedNumberSize)) {
+                alert('الرجاء ملء جميع الحقول المطلوبة واختيار المقاس');
+                return;
+            }
+        
+            if (country === 'العراق' && !province) {
+                alert('الرجاء اختيار المحافظة');
+                return;
+            }
+        
+            if (Object.keys(selectedImages).length === 0) {
+                alert('الرجاء اختيار صورة واحدة على الأقل لكل منتج');
+                return;
+            }
+        
+            database.ref('carts/' + userId).once('value', (snapshot) => {
+                const cart = snapshot.val();
+                if (cart) {
+                    const orderItems = {};
+                    for (let productId in cart) {
+                        const selectedProductImages = selectedImages[productId] || [];
+                        orderItems[productId] = {
+                            ...cart[productId],
+                            selectedImages: selectedProductImages.map(index => cart[productId].images[index])
+                        };
+                    }
+        
+                    const orderData = {
+                        fullName,
+                        country,
+                        province: country === 'العراق' ? province : '',
+                        address,
+                        phone,
+                        alternativePhone,
+                        letterSize: selectedLetterSize,
+                        numberSize: selectedNumberSize,
+                        orderNotes,
+                        userId,
+                        orderDate: new Date().toISOString(),
+                        status: 'pending',
+                        items: orderItems
+                    };
+        
+                    database.ref('orders').push(orderData, (error) => {
+                        if (error) {
+                            alert('حدث خطأ أثناء إرسال الطلب. الرجاء المحاولة مرة أخرى.');
+                        } else {
+                            alert('تم إرسال طلبك بنجاح!');
+                            database.ref('carts/' + userId).remove();
+                            window.location.href = 'index1.html';
+                        }
+                    });
+                } else {
+                    alert('السلة فارغة. الرجاء إضافة منتجات قبل إتمام الشراء.');
+                }
+            });
+        }
+
+        // إعداد اختيار المقاس بالأحرف
+        const letterSizeOptions = document.querySelectorAll('#letterSizePicker .size-option');
+        const customLetterSizeInput = document.getElementById('customLetterSize');
+        letterSizeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                letterSizeOptions.forEach(op => op.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedLetterSize = this.getAttribute('data-size');
+                if (selectedLetterSize === 'أخرى') {
+                    customLetterSizeInput.style.display = 'block';
+                    selectedLetterSize = '';
+                } else {
+                    customLetterSizeInput.style.display = 'none';
+                }
+            });
+        });
+
+        customLetterSizeInput.addEventListener('input', function() {
+            selectedLetterSize = this.value;
+        });
+
+        // إعداد اختيار المقاس بالأرقام
+        const numberSizeOptions = document.querySelectorAll('#numberSizePicker .size-option');
+        const customNumberSizeInput = document.getElementById('customNumberSize');
+        numberSizeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                numberSizeOptions.forEach(op => op.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedNumberSize = this.getAttribute('data-size');
+                if (selectedNumberSize === 'أخرى') {
+                    customNumberSizeInput.style.display = 'block';
+                    selectedNumberSize = '';
+                } else {
+                    customNumberSizeInput.style.display = 'none';
+                }
+            });
+        });
+
+        customNumberSizeInput.addEventListener('input', function() {
+            selectedNumberSize = this.value;
+        });
+
+        window.onload = loadCartItems;
+    </script>
+</body>
+</html>
