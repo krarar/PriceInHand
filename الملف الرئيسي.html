@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلة التسوق</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      :root {
+    --primary-color: #4CAF50;
+    --secondary-color: #2196F3;
+    --accent-color: #FFC107;
+    --background-color: #54525f;
+    --card-background: #224350;
+    --header-background: #333;
+    --header-text: #fff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.5s ease;
+}
+
+        .cart-header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .cart-header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .cart-container {
+            margin: 3rem 1rem 5rem;
+            padding: 0.5rem;
+            background-color: var(--background-color);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+
+        .product-card {
+            background-color: var(--card-background);
+            border-radius: 0.8rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 0.6rem;
+        }
+
+        .product-info h3 {
+            margin: 0 0 0.3rem;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .price {
+            color: var(--price-color);
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .original-price, .discount-price, .super-discount-price {
+            font-size: 0.7rem;
+            margin: 0.1rem 0;
+        }
+
+        .action-icons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 0.5rem;
+        }
+
+        .action-icon {
+            background-color: transparent;
+            border: none;
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .action-icon:hover {
+            color: var(--primary-color);
+        }
+
+        .checkout-button {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            padding: 0.8rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .checkout-button:hover {
+            background-color: #555;
+        }
+
+        @media (max-width: 400px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cart-header">
+        <h1>سلة التسوق</h1>
+    </div>
+
+    <div class="cart-container">
+        <div class="products-grid" id="cartContainer">
+            <!-- Cart items will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <button class="checkout-button" onclick="goToCheckout()">
+        <i class="fas fa-shopping-cart"></i> إتمام الشراء
+    </button>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // Firebase config and initialization
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
+            authDomain: "messageemeapp.firebaseapp.com",
+            databaseURL: "https://messageemeapp-default-rtdb.firebaseio.com",
+            projectId: "messageemeapp",
+            storageBucket: "messageemeapp.appspot.com",
+            messagingSenderId: "255034474844",
+            appId: "1:255034474844:web:5e3b7a6bc4b2fb94cc4199"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let userId = localStorage.getItem('userId') || 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('userId', userId);
+
+        function showCart() {
+            const cartContainer = document.getElementById('cartContainer');
+            cartContainer.innerHTML = '';
+
+            database.ref('carts/' + userId).once('value', (snapshot) => {
+                const cart = snapshot.val();
+                if (cart) {
+                    for (let productId in cart) {
+                        const product = cart[productId];
+                        cartContainer.innerHTML += createCartItemCard(productId, product);
+                    }
+                } else {
+                    cartContainer.innerHTML += '<p>السلة فارغة</p>';
+                }
+            });
+        }
+
+        function createCartItemCard(productId, product) {
+            return `
+                <div class="product-card">
+                    <img src="${product.images[0]}" alt="${product.name}" class="product-image">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p class="price">السعر: $${product.price}</p>
+                        <p class="original-price">الأصلي: $${product.priceOriginal}</p>
+                        <p class="discount-price">الخصم: $${product.priceDiscount}</p>
+                        <p class="super-discount-price">الخصم الفائق: $${product.priceSuperDiscount}</p>
+                        <div class="action-icons">
+                            <button class="action-icon" onclick="removeFromCart('${productId}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="action-icon">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                            <button class="action-icon">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+           // الدالة التي تنقل المستخدم إلى صفحة الخروج (Checkout)
+function goToCheckout() {
+    window.location.href = 'checkout.html';
+}
+
+// الدالة التي تنشئ بطاقة عنصر المنتج في السلة
+function createCartItemCard(productId, product) {
+    return `
+        <div class="product-card" data-product-id="${productId}">
+            <!-- قسم الصور للمنتج -->
+            <div class="product-images">
+                <img src="${product.images[0]}" alt="${product.name}" class="product-image" style="width: 350px; height: 350px;">
+            </div>
+            <!-- قسم المعلومات عن المنتج -->
+            <div class="product-info">
+                <h3>${product.name}</h3>
+                <!-- عرض السعر المختار -->
+                <p class="price">السعر المختار: $${product.price.toFixed(2)}</p>
+                <!-- عرض السعر الأصلي -->
+                <p class="price">السعر الأصلي: $${product.priceOriginal}</p>
+                <!-- عرض سعر الخصم -->
+                <p class="price">سعر الخصم: $${product.priceDiscount}</p>
+                <!-- عرض سعر الخصم الفائق -->
+                <p class="price">سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
+                <!-- زر لإزالة المنتج من السلة -->
+                <button class="action-button" onclick="removeFromCart('${productId}')">
+                    <i class="fas fa-trash"></i> إزالة من السلة
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// الدالة التي تقوم بإزالة المنتج من السلة
+function removeFromCart(productId) {
+    // الوصول إلى قاعدة البيانات Firebase وإزالة المنتج من سلة المستخدم
+    database.ref('carts/' + userId + '/' + productId).remove()
+        .then(() => {
+            // عرض رسالة تأكيد للمستخدم عند نجاح إزالة المنتج
+            alert('تم إزالة المنتج من السلة بنجاح!');
+            // تحديث عرض السلة بعد إزالة المنتج
+            showCart();
+            // تحديث عدد المنتجات في السلة
+            updateCartCount();
+        })
+        .catch((error) => {
+            // عرض رسالة خطأ في حال حدث مشكلة أثناء إزالة المنتج
+            alert('حدث خطأ أثناء إزالة المنتج من السلة.');
+        });
+}
+
+        window.onload = showCart;
+    </script>
+</body>
+</html>
