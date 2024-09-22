@@ -9,11 +9,16 @@
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
         
         :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #34c759;
-            --accent-color: #ff3b30;
-            --text-color: #333;
-            --bg-color: #f4f4f4;
+            --primary-color: #2C3E50;
+            --secondary-color: #27AE60;
+            --accent-color: #F39C12;
+            --text-color: #2C3E50;
+            --background-color: #ECF0F1;
+            --card-background: #FFFFFF;
+            --header-background: #34495E;
+            --header-text: #ECF0F1;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --button-hover-color: #E67E22;
         }
 
         * {
@@ -24,7 +29,7 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--background-color);
             color: var(--text-color);
             overflow-x: hidden;
             padding: 0;
@@ -60,13 +65,13 @@
         }
 
         h1, h2 {
-            color: #fff;
+            color: var(--header-text);
             margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            text-shadow: 2px 2px 4px var(--shadow-color);
         }
 
         p {
-            color: #fff;
+            color: var(--header-text);
             max-width: 80%;
             margin-bottom: 20px;
             font-size: 18px;
@@ -74,7 +79,7 @@
         }
 
         .btn {
-            background-color: #fff;
+            background-color: var(--card-background);
             color: var(--primary-color);
             border: none;
             padding: 12px 30px;
@@ -84,14 +89,14 @@
             margin: 10px;
             border-radius: 30px;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px var(--shadow-color);
         }
 
         .btn:hover {
-            background-color: var(--accent-color);
-            color: #fff;
+            background-color: var(--button-hover-color);
+            color: var(--header-text);
             transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 7px 20px var(--shadow-color);
         }
 
         .logo {
@@ -99,7 +104,7 @@
             height: 150px;
             margin-bottom: 30px;
             border-radius: 50%;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px var(--shadow-color);
             animation: pulse 2s infinite;
         }
 
@@ -109,7 +114,7 @@
             object-fit: cover;
             border-radius: 20px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px var(--shadow-color);
         }
 
         .progress-bar {
@@ -124,7 +129,7 @@
         .progress {
             width: 0;
             height: 100%;
-            background-color: #fff;
+            background-color: var(--header-text);
             transition: width 0.5s ease-in-out;
         }
 
@@ -133,7 +138,7 @@
         }
 
         .social-icons a {
-            color: #fff;
+            color: var(--header-text);
             font-size: 24px;
             margin: 0 10px;
             text-decoration: none;
@@ -188,8 +193,8 @@
 <body>
     <div id="screen1" class="welcome-screen active">
         <div class="content-wrapper">
-            <img src="https://lh3.googleusercontent.com/a/ACg8ocI6GS6JwgEqUzq1arsBk2qjlkKItXFcNV5QPsM__WmW5h_GV0V3=s864-c-no" alt="شعار التطبيق" class="logo">
-            <h1>مرحبًا بك في تطبيق التسوق الحديث</h1>
+            <img src="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2Ffestive-christmas-shopping-vector-illustration-with-cheerful-holiday-atmosphere_1141064-22866.jpg?alt=media&token=fa6d1598-bb03-479e-a3f4-f8740322f005" alt="شعار التطبيق" class="logo">
+            <h1>مرحبًا بك في متجر سعرك بيدك </h1>
             <p>اكتشف تجربة تسوق مبتكرة مع مجموعة من المنتجات والميزات الجديدة كليًا.</p>
             <button class="btn" onclick="showScreen(2)">ابدأ الآن <i class="fas fa-arrow-left"></i></button>
         </div>
@@ -208,7 +213,7 @@
 
     <div id="screen2" class="welcome-screen">
         <div class="content-wrapper">
-            <img src="https://lh3.googleusercontent.com/a/ACg8ocI6GS6JwgEqUzq1arsBk2qjlkKItXFcNV5QPsM__WmW5h_GV0V3=s864-c-no" alt="تصفح وابحث" class="screen-image">
+            <img src="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2Ffashion-sale-landing-page_23-2148587975.jpg?alt=media&token=7f95ab6d-228f-4247-8a0b-44b5b18f0cd7" alt="تصفح وابحث" class="screen-image">
             <h2>تصفح وابحث بسهولة</h2>
             <p>استكشف مجموعة واسعة من المنتجات واستخدم أدوات البحث المتقدمة للعثور على ما تريد بسرعة.</p>
             <button class="btn" onclick="showScreen(3)">التالي <i class="fas fa-arrow-left"></i></button>
@@ -228,7 +233,7 @@
 
     <div id="screen3" class="welcome-screen">
         <div class="content-wrapper">
-            <img src="https://lh3.googleusercontent.com/a/ACg8ocI6GS6JwgEqUzq1arsBk2qjlkKItXFcNV5QPsM__WmW5h_GV0V3=s864-c-no" alt="شراء المنتجات" class="screen-image">
+            <img src="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2Fflat-design-reseller-illustration_23-2149484585.jpg?alt=media&token=ca78828a-6fe9-4680-b509-bd8c545b786b" alt="شراء المنتجات" class="screen-image">
             <h2>تسوق بثقة وأمان</h2>
             <p>اختر منتجاتك المفضلة وقم بإتمام عملية الشراء بسهولة وسرعة مع ضمان أمان معلوماتك.</p>
             <button class="btn" onclick="finishWelcome()">ابدأ التسوق <i class="fas fa-shopping-cart"></i></button>
