@@ -979,25 +979,26 @@ select:focus {
         border-radius: 5px;
         cursor: pointer;
     }
-
-    .custom-input {
+    input[type="email"], input[type="password"] {
         width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
+        padding: 12px;
+        margin: 10px 0;
         border-radius: 5px;
-        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         font-size: 1rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-
+    
     </style>
 </head>
 <body>
     <div class="header">
-        <button class="login-button" onclick="showLoginPopup()">
-            <i class="fas fa-sign-in-alt"></i> سعرك بيدك
-        </button>
-        
+        <div class="header-content">
+            <h1> سعرك بيدك</h1>
+            <button class="login-button" onclick="showLoginPopup()" style="display: flex; align-items: center; padding: 5px 10px; font-size: 0.9rem;">
+                <i class="fas fa-sign-in-alt" style="font-size: 1.2rem; margin-right: 5px;"></i>
+            </button>
+            
             <div class="header-controls">
                 <div class="search-container">
                     <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
@@ -1062,13 +1063,13 @@ select:focus {
                 <div class="subscriber-count">
                     المشاهدات: <span class="flip-card" id="views">0</span>
                 </div>
-               
+
             </div>
             <div id="loginPopup" class="popup-overlay" style="display:none;">
                 <div class="popup-content">
-                    <h3>تسجيل الدخول</h3><input type="email" class="custom-input" placeholder="البريد الإلكتروني">
-                    <input type="password" class="custom-input" placeholder="كلمة المرور">
-                    
+                    <h3>تسجيل الدخول</h3>
+                    <input type="email" id="email" placeholder="البريد الإلكتروني">
+                    <input type="password" id="password" placeholder="كلمة المرور">
                     <button onclick="loginWithEmail()">تسجيل الدخول</button>
                     
                     <div class="social-login">
@@ -1092,6 +1093,11 @@ select:focus {
  
     </div>
     <div id="mySidebar" class="sidebar">
+        <div class="user-info" id="userInfo">
+            <img id="userAvatar" src="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737" alt="User Avatar" style="border-radius: 50%; width: 50px; height: 50px;">
+            <span id="userName">مجهول</span>
+        </div>
+        
         <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">&times;</a>
         <a href="#" onclick="fetchProducts()"><i class="fas fa-home sidebar-icon"></i> الرئيسية</a>
         <a href="#" onclick="showLikedProducts()"><i class="fas fa-heart sidebar-icon"></i> الإعجابات</a>
@@ -1099,6 +1105,8 @@ select:focus {
         <a href="#" onclick="showSavedProducts()"><i class="fas fa-bookmark sidebar-icon"></i> المحفوظات</a>
         <a href="#" onclick="showCategories()"><i class="fas fa-list sidebar-icon"></i> التصنيفات</a>
         <a href="#" onclick="showOffers()"><i class="fas fa-percentage sidebar-icon"></i> العروض</a>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt sidebar-icon"></i> تسجيل الخروج</a>
+
     </div>
     <div class="products" id="products">
         <!-- Products will be dynamically loaded here -->
@@ -1231,6 +1239,26 @@ select:focus {
             const darkModeToggle = document.querySelector('.dark-mode-toggle i');
             darkModeToggle.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
         }
+
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                localStorage.setItem('userId', user.uid);
+                updateLoginUI(); // تحديث واجهة المستخدم بعد تسجيل الدخول
+            } else {
+                // في حالة عدم وجود جلسة مستخدم مسجلة
+                showLoginPopup();
+            }
+        });
+        
+        function logout() {
+            firebase.auth().signOut().then(function() {
+                localStorage.removeItem('userId');
+                window.location.reload(); // إعادة تحميل الصفحة بعد تسجيل الخروج
+            }).catch(function(error) {
+                console.error('Error signing out:', error);
+            });
+        }
+        
 
         function showLoginPopup() {
             document.getElementById("loginPopup").style.display = "flex";
