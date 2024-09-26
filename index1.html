@@ -980,12 +980,24 @@ select:focus {
         cursor: pointer;
     }
 
+    .custom-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        font-size: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="header-content">
-            <h1> سعرك بيدك</h1>
+        <button class="login-button" onclick="showLoginPopup()">
+            <i class="fas fa-sign-in-alt"></i> سعرك بيدك
+        </button>
+        
             <div class="header-controls">
                 <div class="search-container">
                     <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
@@ -1050,14 +1062,13 @@ select:focus {
                 <div class="subscriber-count">
                     المشاهدات: <span class="flip-card" id="views">0</span>
                 </div>
-                <button class="login-button" onclick="showLoginPopup()">تسجيل الدخول</button>
-
+               
             </div>
             <div id="loginPopup" class="popup-overlay" style="display:none;">
                 <div class="popup-content">
-                    <h3>تسجيل الدخول</h3>
-                    <input type="email" id="email" placeholder="البريد الإلكتروني">
-                    <input type="password" id="password" placeholder="كلمة المرور">
+                    <h3>تسجيل الدخول</h3><input type="email" class="custom-input" placeholder="البريد الإلكتروني">
+                    <input type="password" class="custom-input" placeholder="كلمة المرور">
+                    
                     <button onclick="loginWithEmail()">تسجيل الدخول</button>
                     
                     <div class="social-login">
