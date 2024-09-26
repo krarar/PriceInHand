@@ -931,24 +931,47 @@ select:focus {
         color: #871515; /* لون النص داخل العناصر */
     }
 
-    .login-form {
-        text-align: center;
-        margin: 20px;
-        padding: 20px;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
     }
-    .login-form input {
+    
+    .popup-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 300px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .close-popup {
+        margin-top: 10px;
+        background-color: #f44336;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .popup-content input {
         width: 100%;
         padding: 10px;
         margin: 10px 0;
         border: 1px solid #ccc;
         border-radius: 5px;
     }
-    .social-login {
-        margin-top: 15px;
-    }
+    
     .social-login button {
         margin: 5px;
         padding: 10px 20px;
@@ -956,7 +979,6 @@ select:focus {
         border-radius: 5px;
         cursor: pointer;
     }
-
 
     </style>
 </head>
@@ -1028,10 +1050,25 @@ select:focus {
                 <div class="subscriber-count">
                     المشاهدات: <span class="flip-card" id="views">0</span>
                 </div>
-                <button class="login-button" onclick="redirectToLoginPage()">تسجيل الدخول</button> 
-            </div>
+                <button class="login-button" onclick="showLoginPopup()">تسجيل الدخول</button>
 
-            
+            </div>
+            <div id="loginPopup" class="popup-overlay" style="display:none;">
+                <div class="popup-content">
+                    <h3>تسجيل الدخول</h3>
+                    <input type="email" id="email" placeholder="البريد الإلكتروني">
+                    <input type="password" id="password" placeholder="كلمة المرور">
+                    <button onclick="loginWithEmail()">تسجيل الدخول</button>
+                    
+                    <div class="social-login">
+                        <p>أو تسجيل الدخول باستخدام</p>
+                        <button class="gmail-button" onclick="loginWithGoogle()">جيميل</button>
+                        <button class="facebook-button" disabled>فيسبوك</button>
+                        <button class="apple-button" disabled>آبل</button>
+                    </div>
+                    <button class="close-popup" onclick="hideLoginPopup()">إغلاق</button>
+                </div>
+            </div>
             <!-- زر السلة المنبثق -->
 <button class="popup-button" onclick="redirectToCartPage()">
     <i class="fas fa-shopping-cart"></i>
@@ -1041,20 +1078,7 @@ select:focus {
         <div class="products-grid" id="likesContainer">
     <!-- Liked items will be dynamically loaded here -->
 </div>
-<div class="login-form">
-    <h3>تسجيل الدخول</h3>
-    <input type="email" id="email" placeholder="البريد الإلكتروني">
-    <input type="password" id="password" placeholder="كلمة المرور">
-    
-    <button onclick="loginWithEmail()">تسجيل الدخول</button>
-    
-    <div class="social-login">
-        <p>أو تسجيل الدخول باستخدام</p>
-        <button class="gmail-button" onclick="loginWithGoogle()">جيميل</button>
-        <button class="facebook-button" disabled>فيسبوك</button>
-        <button class="apple-button" disabled>آبل</button>
-    </div>
-</div>
+ 
     </div>
     <div id="mySidebar" class="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">&times;</a>
@@ -1197,24 +1221,46 @@ select:focus {
             darkModeToggle.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
         }
 
+        function showLoginPopup() {
+            document.getElementById("loginPopup").style.display = "flex";
+        }
+        
+        function hideLoginPopup() {
+            document.getElementById("loginPopup").style.display = "none";
+        }
+        function loginWithEmail() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    localStorage.setItem('userId', user.uid);
+                    localStorage.setItem('userImage', user.photoURL || 'default-profile.png');
+                    hideLoginPopup();
+                    updateLoginUI();
+                })
+                .catch((error) => {
+                    alert('Login Failed: ' + error.message);
+                });
+        }
         function loginWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider)
+            firebase.auth().signInWithPopup(provider)
                 .then((result) => {
                     const user = result.user;
                     localStorage.setItem('userId', user.uid);
                     localStorage.setItem('userImage', user.photoURL || 'default-profile.png');
-                    window.location.href = 'index.html';  // Redirect back after login
+                    hideLoginPopup();
+                    updateLoginUI();
                 })
                 .catch((error) => {
                     console.error('Login Failed:', error);
                 });
-        }
-
-        window.onload = () => {
+        }function updateLoginUI() {
             const userId = localStorage.getItem('userId');
-            const userImage = localStorage.getItem('userImage') || 'https://lh3.googleusercontent.com/a/AEdFTp5Lf4Wx7lkibuTMLpR3oVcyIMPj4_BXkzQMAWRwwQ=s96-c';
-    
+            const userImage = localStorage.getItem('userImage') || 'default-profile.png';
+        
             if (userId) {
                 document.querySelector('.login-button').style.display = 'none';
                 const profileImg = document.createElement('img');
@@ -1225,6 +1271,8 @@ select:focus {
                 document.querySelector('.subscriber-count').appendChild(profileImg);
             }
         }
+        
+        
 
         function toggleLanguage() {
             currentLanguage = currentLanguage === 'ar' ? 'en' : 'ar';
