@@ -1562,7 +1562,7 @@ function createCartItemCard(productId, product) {
 // الدالة التي تقوم بإزالة المنتج من السلة
 function removeFromCart(productId) {
     // الوصول إلى قاعدة البيانات Firebase وإزالة المنتج من سلة المستخدم
-    database.ref('carts3/' + userId + '/' + productId).remove()
+    database.ref('carts/' + userId + '/' + productId).remove()
         .then(() => {
             // عرض رسالة تأكيد للمستخدم عند نجاح إزالة المنتج
             alert('تم إزالة المنتج من السلة بنجاح!');
@@ -2134,7 +2134,7 @@ function filterProductsByCategory(category) {
             if (currentProductId && currentPrice) {
                 database.ref('products/' + currentProductId).once('value', (snapshot) => {
                     const product = snapshot.val();
-                    const cartRef = database.ref('carts3/' + userId + '/' + currentProductId);
+                    const cartRef = database.ref('carts/' + userId + '/' + currentProductId);
                     cartRef.set({
                         name: product.name,
                         images: product.images || [product.image],
@@ -2256,7 +2256,7 @@ function filterProductsByCategory(category) {
 
         function transferCartToCheckout() {
             const cartItems = [];
-            database.ref('carts3/' + userId).once('value', (snapshot) => {
+            database.ref('carts/' + userId).once('value', (snapshot) => {
                 const cart = snapshot.val();
                 if (cart) {
                     for (let productId in cart) {
@@ -2282,7 +2282,7 @@ function filterProductsByCategory(category) {
             imageElement.src = selectedImage;
 
             // تحديث الصورة المختارة في قاعدة البيانات
-            database.ref(`carts3/${userId}/${productId}/selectedImage`).set(selectedImage);
+            database.ref(`carts/${userId}/${productId}/selectedImage`).set(selectedImage);
         }
 
    // دالة تقوم بفتح الصفحة المطلوبة عند النقر على زر السلة
@@ -2297,7 +2297,7 @@ function filterProductsByCategory(category) {
     // دالة لنقل بيانات السلة إلى صفحة إتمام الشراء
     function transferCartToCheckout() {
         const cartItems = [];
-        database.ref('carts3/' + userId).once('value', (snapshot) => {
+        database.ref('carts/' + userId).once('value', (snapshot) => {
             const cart = snapshot.val();
             if (cart) {
                 for (let productId in cart) {
