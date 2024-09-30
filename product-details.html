@@ -65,15 +65,41 @@ body {
 .header {
     background-color: var(--header-background);
     color: var(--header-text);
-    padding: 0.8rem;
-    position: fixed;
+    padding-top: 1px;   /* التحكم في المسافة الداخلية من الأعلى */
+    padding-bottom: -100px; /* التحكم في المسافة الداخلية من الأسفل */
+    margin-top: -20px;    /* التحكم في المسافة من أعلى الصفحة أو العناصر الأخرى */
+    margin-bottom: 20px; /* التحكم في المسافة من أسفل شريط العنوان */
+    position: fixed;     /* لإبقاء شريط العنوان ثابتًا في أعلى الصفحة */
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;       /* للتأكد من بقاء العنوان فوق جميع العناصر */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* إضافة ظل */
 }
 
+
+.carousel {
+    width: 100%;
+    height: 200px; /* ارتفاع شريط الإعلان */
+    margin-top: 158px; /* التحكم في المسافة من الأعلى */
+    margin-bottom: 10px; /* التحكم في المسافة من الأسفل */
+    padding-top: 30px; /* إضافة فراغ داخلي من الأعلى */
+    padding-bottom: 10px; /* إضافة فراغ داخلي من الأسفل */
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+ /* خانة التصنيف */
+ #categorySelect {
+    margin-top: 0px;
+    width: 100%;
+    padding: 1px;
+    font-size: 0.5rem;
+    border: 0px solid #ccc;
+    border-radius: 15px;
+}
 .header-content {
     display: flex;
     flex-direction: column;
@@ -105,13 +131,17 @@ body {
 .search-icon {
     position: absolute;
     left: 10px;
-    top: 50%;
+    top: 70%;
     transform: translateY(-50%);
     color: #FFFFFF;
     cursor: pointer;
 }
 
 #searchInput {
+padding: 10px 30px; /* تعديل القيم لزيادة أو تقليل المسافة الداخلية */
+    margin-top: 10px; /* المسافة العلوية */
+    margin-bottom: 1px; /* المسافة السفلية */
+    border-radius: 20px; /* تعديل شكل الحواف */
     width: 100%;
     padding: 0.5rem 2rem;
     border-radius: 20px;
@@ -181,17 +211,17 @@ body {
 }
 
 .sidebar-icon {
-    margin-right: 10px;
-    width: 20px;
+    margin-right: 5px;
+    width: 10px;
     text-align: center;
 }
 
 .products {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(p10px, 1fr));
     gap: 1rem;
     padding: 1rem;
-    margin-top: 120px;
+    margin-top: 350px;
     margin-bottom: 1rem;
 }
 
@@ -412,6 +442,7 @@ body {
 }
 
 .add-product-btn {
+display: none;
     position: fixed;
     bottom: 5rem;
     left: 1rem;
@@ -488,7 +519,7 @@ body {
     --background-color: #000000; /* لون الخلفية: رمادي فاتح */
     --card-background: #000000; /* لون خلفية البطاقة: أبيض */
     --header-background: #000000; /* لون خلفية العنوان: أزرق رمادي */
-    --header-text: #f6f937; /* لون نص العنوان: رمادي فاتح */
+    --header-text: #F39C12; /* لون نص العنوان: رمادي فاتح */
     --shadow-color: rgba(0, 0, 0, 0.1); /* لون الظل: أسود شفاف */
     --button-hover-color: #E67E22; /* لون الأزرار عند التمرير: برتقالي داكن */
 }
@@ -575,16 +606,17 @@ body {
     justify-content: space-between;
     padding: 0 20px;
     z-index: 1000;
-    gap: 30px;
+    gap: 50px;
 }
+
 
 .digital-clock, .subscriber-count {
     background-color: var(--header-background);
     color: white;
-    padding: 7px 10px;
-    border-radius: 9px;
+    padding: 20px 10px;
+    border-radius: 15px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    font-size: 0.9rem;
+    font-size: 0.20rem;
     font-weight: bold;
 }
 
@@ -606,11 +638,11 @@ body {
 
 @media screen and (max-width: 768px) {
     body {
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .header {
-        padding: 0.75rem;
+        padding: 0.5rem;
     }
 
     .header h1 {
@@ -627,10 +659,10 @@ body {
     }
 
     .products {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 0.8rem;
         padding: 0.8rem;
-        margin-top: 110px;
+        margin-top: 0px;
     }
 
     .product-card {
@@ -728,10 +760,10 @@ body {
 
 @media screen and (max-width: 880px) {
     .products {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
         gap: 0.6rem;
         padding: 0.6rem;
-        margin-top: 170px;
+        margin-top150px;
     }
 
     .product-card {
@@ -893,8 +925,7 @@ select:focus {
     box-shadow: 0 12px 114px rgba(0, 0, 0, 0.2);
 }
 
-<!-- تحسين التصميم لقائمة التصنيفات -->
-<style>
+
     .custom-select {
         width: 100%;
         padding: 12px;
@@ -933,13 +964,154 @@ select:focus {
     }
 
 
+    .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+    
+    .popup-content {
+        background-color: #000000;
+        padding: 20px;
+        border-radius: 10px;
+        width: 300px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .close-popup {
+        margin-top: 10px;
+        background-color: #f44336;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+  
+    
+     .loginWithEmail {
+        margin-top: 10px;
+        background-color: #f44336;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .popup-content input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    
+    .social-login button {
+        margin: 5px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    input[type="email"], input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-size: 1rem;
+    }
+    
+
+
+    
+   .popup1-button {
+    position: fixed;
+    bottom: 4rem;
+    right: 18rem; /* Adjust this value to place buttons next to each other */
+    background-color: #2C3E50;
+    color: #FFC107;
+    padding: 1rem;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+}
+
+.message-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #FF5733; /* يمكنك تغيير اللون كما تريد */
+    color: white;
+    border-radius: 50%;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    z-index: 1001;
+}
+
+    /* الإعلان */
+
+.carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* لضمان أن الصورة تغطي العنصر بشكل كامل بدون تمدد */
+    position: absolute;
+    top: 0;
+    left: 200%;
+    transition: left 1s ease-in-out; /* حركة الانزلاق بين الصور */
+}
+
+.carousel img.active {
+    left: 0; /* تجعل الصورة الحالية مرئية */
+}
+.subscriber-count {
+    position: fixed; /* لجعل الزر ثابتًا في مكانه حتى عند التمرير */
+    top: 0; /* المسافة من الأعلى */
+    left: 0; /* المسافة من اليسار */
+    margin: 10px; /* إضافة مسافة خارجية اختيارية */
+    padding: 0px; /* المسافة الداخلية حول المحتوى */
+    background-color: #34495E; /* يمكنك تعديل لون الخلفية إذا أردت */
+    color: white; /* لون النص */
+    z-index: 1000; /* للتأكد من أن العنصر يبقى فوق جميع العناصر الأخرى */
+    border-radius: 10px; /* حواف مستديرة للعنصر */
+}
+#priceInHand {
+    position: relative; /* يسمح بالتحكم في موقع النص */
+    top: 20; /* التحكم بالمسافة من الأعلى */
+    left: 0; /* التحكم بالمسافة من اليسار */
+    margin-top: 29px; /* المسافة الخارجية من الأعلى */
+    margin-bottom: 0px; /* المسافة الخارجية من الأسفل */
+    margin-left: 20px; /* المسافة الخارجية من اليسار */
+    margin-right: 20px; /* المسافة الخارجية من اليمين */
+    font-size: 1.5rem; /* حجم النص */
+    color: white; /* لون النص */
+}
+
+
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-content">
-            <h1> سعرك بيدك</h1>
-            <div class="header-controls">
+            <h1 id="priceInHand">سعرك بيدك</h1>
+                </button>
+              <div class="header-controls">
                 <div class="search-container">
                     <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
                     <input type="text" id="searchInput" placeholder="البحث عن المنتجات...">
@@ -992,6 +1164,9 @@ select:focus {
     <option value="classic-clothing">كلاسيك</option>
     <option value="miscellaneous">تصنيفات متنوعة</option>
 </select>
+  </div>
+  
+
 
 
          <div class="floating-info">
@@ -1000,9 +1175,15 @@ select:focus {
                     <span class="flip-card" id="minutes">00</span>:
                     <span class="flip-card" id="seconds">00</span>
                 </div>
-                <div class="subscriber-count">
-                    المشاهدات: <span class="flip-card" id="views">0</span>
+            
                 </div>
+
+       <div class="subscriber-count">
+    المشاهدات: <span class="flip-card" id="views">0</span>
+</div>
+
+
+                  
             </div>
             <!-- زر السلة المنبثق -->
 <button class="popup-button" onclick="redirectToCartPage()">
@@ -1013,9 +1194,20 @@ select:focus {
         <div class="products-grid" id="likesContainer">
     <!-- Liked items will be dynamically loaded here -->
 </div>
- 
+ <button class="popup1-button" onclick="redirectToMessagesPage()">
+    <i class="fas fa-envelope"></i>
+    <span id="messageCount" class="message-count">0</span> <!-- عداد الرسائل -->
+</button>
+
+
+
     </div>
     <div id="mySidebar" class="sidebar">
+        <div class="user-info" id="userInfo">
+            <img id="userAvatar" src="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737" alt="User Avatar" style="border-radius: 50%; width: 50px; height: 50px;">
+            <span id="userName">     1995-1-1-110-</span>
+        </div>
+        
         <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">&times;</a>
         <a href="#" onclick="fetchProducts()"><i class="fas fa-home sidebar-icon"></i> الرئيسية</a>
         <a href="#" onclick="showLikedProducts()"><i class="fas fa-heart sidebar-icon"></i> الإعجابات</a>
@@ -1023,10 +1215,11 @@ select:focus {
         <a href="#" onclick="showSavedProducts()"><i class="fas fa-bookmark sidebar-icon"></i> المحفوظات</a>
         <a href="#" onclick="showCategories()"><i class="fas fa-list sidebar-icon"></i> التصنيفات</a>
         <a href="#" onclick="showOffers()"><i class="fas fa-percentage sidebar-icon"></i> العروض</a>
+        
     </div>
-    <div class="products" id="products">
-        <!-- Products will be dynamically loaded here -->
-    </div>
+   
+
+    </div>:
     
     <div class="bottom-navbar">
         <a href="#" onclick="fetchProducts()" class="nav-item">
@@ -1065,14 +1258,15 @@ select:focus {
 
     <button class="add-product-btn" onclick="toggleAddProductForm()"><i class="fas fa-plus"></i></button>
     <div class="add-product-form" id="addProductForm">
-        <h3>إضافة منتج جديد</h3>
-        <input type="text" id="newProductName" placeholder="اسم المنتج">
-        <input type="file" id="newProductImage" accept="image/*" multiple>
-        <input type="number" id="newProductPriceOriginal" placeholder="السعر الأصلي">
-        <input type="number" id="newProductPriceDiscount" placeholder="سعر الخصم">
-        <input type="number" id="newProductPriceSuperDiscount" placeholder="سعر الخصم الفائق">
-      <select id="newProductCategory" class="custom-select">
-    <option value="">اختر التصنيف</option>
+    <h3>إضافة منتج جديد</h3>
+    <input type="text" id="newProductName" placeholder="اسم المنتج">
+    <input type="file" id="newProductImage" accept="image/*" multiple>
+    <input type="number" id="newProductPriceOriginal" placeholder="السعر الأصلي">
+    <input type="number" id="newProductPriceDiscount" placeholder="سعر الخصم">
+    <input type="number" id="newProductPriceSuperDiscount" placeholder="سعر الخصم الفائق">
+    <input type="text" id="newProductFileName" placeholder="اسم ملف الصفحة (HTML)">
+    <select id="newProductCategory" class="custom-select">
+        <option value="">اختر التصنيف</option>
     <option value="men-clothing">ملابس رجالي</option>
     <option value="kids-clothing">ملابس أطفال</option>
     <option value="women-clothing">ملابس نسائي</option>
@@ -1114,13 +1308,28 @@ select:focus {
         <button onclick="addProduct()">إضافة المنتج</button>
         
    
-        
+        </div>
+           
+    <!-- الإعلان (carousel) -->
+    <div class="carousel">
+        <img src="https://firebasestorage.googleapis.com/v0/b/chatapp-e6143.appspot.com/o/ads%2F1720736479851.jpg?alt=media&token=c7379cf2-1996-4ec2-bf87-2bfb48cc383e" class="active" alt="Image 1" data-url="index.html">
+        <img src="https://firebasestorage.googleapis.com/v0/b/chatapp-e6143.appspot.com/o/ads%2F1720736479851.jpg?alt=media&token=c7379cf2-1996-4ec2-bf87-2bfb48cc383e" alt="Image 2" data-url="order.html">
+        <img src="https://firebasestorage.googleapis.com/v0/b/chatapp-e6143.appspot.com/o/ads%2F1720736479851.jpg?alt=media&token=c7379cf2-1996-4ec2-bf87-2bfb48cc383e" alt="Image 3" data-url="orders.html">
+    </div>
+
+    <!-- المنتجات -->
+    <div class="products" id="products">
+        <!-- المنتجات ستظهر هنا -->
+    </div>
+</body>
+                    
         
     
     </div>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
@@ -1132,6 +1341,7 @@ select:focus {
             appId: "1:255034474844:web:5e3b7a6bc4b2fb94cc4199"
         };
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const database = firebase.database();
         const storage = firebase.storage();
 
@@ -1152,6 +1362,119 @@ select:focus {
             const darkModeToggle = document.querySelector('.dark-mode-toggle i');
             darkModeToggle.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
         }
+
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                localStorage.setItem('userId', user.uid);
+                updateLoginUI(); // تحديث واجهة المستخدم بعد تسجيل الدخول
+            } else {
+                // في حالة عدم وجود جلسة مستخدم مسجلة
+                showLoginPopup();
+            }
+        });
+        function formatViews(views) {
+    if (views >= 1000000) {
+        return (views / 1000000).toFixed(1) + 'M'; // إذا كان عدد المشاهدات بالملايين
+    } else if (views >= 1000) {
+        return (views / 1000).toFixed(1) + 'K'; // إذا كان عدد المشاهدات بالآلاف
+    } else {
+        return views.toString(); // إذا كان العدد أقل من 1000 يعرض العدد كما هو
+    }
+}
+
+// تحديث عدد المشاهدات ديناميكيًا
+function updateViewsCount(views) {
+    const viewsElement = document.getElementById('views');
+    viewsElement.textContent = formatViews(views);
+}
+
+// مثال على استدعاء الدالة مع عدد مشاهدات كبير
+let viewsCount = 120000; // يمكنك جلب هذا العدد من قاعدة البيانات أو أي مصدر آخر
+updateViewsCount(viewsCount);
+
+      // Function to redirect to the Messages HTML page
+// عند تحميل الصفحة الرئيسية، جلب عدد الرسائل من قاعدة البيانات
+function fetchMessageCount() {
+    const messageCountRef = firebase.database().ref('messageCount/counter');
+    
+    messageCountRef.on('value', function(snapshot) {
+        const count = snapshot.val() || 0; // الحصول على العدد أو استخدام 0 إذا لم يكن موجودًا
+        document.getElementById('messageCount').textContent = count; // تحديث العداد في الواجهة
+    });
+}
+// Function to redirect to the Messages HTML page
+function redirectToMessagesPage() {
+    window.location.href = 'messages.html'; // Replace with your actual messages HTML file path
+}
+
+
+// استدعاء الدالة عند تحميل الصفحة الرئيسية
+window.onload = fetchMessageCount;
+
+  
+        
+        function logout() {
+            firebase.auth().signOut().then(function() {
+                localStorage.removeItem('userId');
+                window.location.reload(); // إعادة تحميل الصفحة بعد تسجيل الخروج
+            }).catch(function(error) {
+                console.error('Error signing out:', error);
+            });
+        }
+        
+
+        function showLoginPopup() {
+            document.getElementById("loginPopup").style.display = "flex";
+        }
+        
+        function hideLoginPopup() {
+            document.getElementById("loginPopup").style.display = "none";
+        }
+        function loginWithEmail() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    localStorage.setItem('userId', user.uid);
+                    localStorage.setItem('userImage', user.photoURL || 'https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F7da94f84-c767-466c-b0d3-b7bb852fd5e7.webp?alt=media&token=83c906f1-292a-4629-819b-3d137c911737');
+                    hideLoginPopup();
+                    updateLoginUI();
+                })
+                .catch((error) => {
+                    alert('Login Failed: ' + error.message);
+                });
+        }
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    localStorage.setItem('userId', user.uid);
+                    localStorage.setItem('userImage', user.photoURL || 'default-profile.png');
+                    hideLoginPopup();
+                    updateLoginUI();
+                })
+                .catch((error) => {
+                    console.error('Login Failed:', error);
+                });
+        }function updateLoginUI() {
+            const userId = localStorage.getItem('userId');
+            const userImage = localStorage.getItem('userImage') || 'default-profile.png';
+        
+            if (userId) {
+                document.querySelector('.login-button').style.display = 'none';
+                const profileImg = document.createElement('img');
+                profileImg.src = userImage;
+                profileImg.alt = 'Profile Image';
+                profileImg.style.width = '50px';
+                profileImg.style.height = '50px';
+                document.querySelector('.subscriber-count').appendChild(profileImg);
+            }
+        }
+        
+        
 
         function toggleLanguage() {
             currentLanguage = currentLanguage === 'ar' ? 'en' : 'ar';
@@ -1239,7 +1562,7 @@ function createCartItemCard(productId, product) {
 // الدالة التي تقوم بإزالة المنتج من السلة
 function removeFromCart(productId) {
     // الوصول إلى قاعدة البيانات Firebase وإزالة المنتج من سلة المستخدم
-    database.ref('carts/' + userId + '/' + productId).remove()
+    database.ref('carts3/' + userId + '/' + productId).remove()
         .then(() => {
             // عرض رسالة تأكيد للمستخدم عند نجاح إزالة المنتج
             alert('تم إزالة المنتج من السلة بنجاح!');
@@ -1418,29 +1741,14 @@ window.onload = () => {
         }
 
         // Update the fetchProducts function to also update the cart count
-        function fetchProducts() {
-            const productsContainer = document.getElementById('products');
-            database.ref('products').on('value', (snapshot) => {
-                const products = snapshot.val();
-                productsContainer.innerHTML = '';
-                for (let key in products) {
-                    const product = products[key];
-                    const productCard = createProductCard(key, product);
-                    productsContainer.innerHTML += productCard;
-                }
-                initializeImageSliders();
-                updateCartCount();
-            });
-        }
-        // Update the createProductCard function to include the cart button
-        function createProductCard(key, product) {
+       function createProductCard(key, product) {
     const images = product.images || [product.image];
     const imagesHtml = images.map((img, index) => `
-        <img src="${img}" alt="${product.name}" class="product-image" style="opacity: ${index === 0 ? 1 : 0};">
+        <img src="${img}" alt="${product.name}" class="product-image" style="opacity: ${index === 0 ? 1 : 0};" onclick="redirectToProductPage('${product.fileName}')">
     `).join('');
 
     return `
-        <div class="product-card" data-product-id="${key}" onclick="redirectToProductPage('${key}')">
+        <div class="product-card" data-product-id="${key}">
             <div class="product-images">
                 ${imagesHtml}
                 <button class="image-nav prev" onclick="changeImage('${key}', -1)">❮</button>
@@ -1473,6 +1781,79 @@ window.onload = () => {
             </div>
         </div>
     `;
+}
+
+// دالة لإعادة التوجيه إلى صفحة المنتج
+function redirectToProductPage(fileName) {
+    if (fileName) {
+        window.location.href = fileName; // الانتقال إلى صفحة HTML المرتبطة بالمنتج
+    } else {
+        alert('لا يوجد ملف مرتبط بهذا المنتج.');
+    }
+}
+
+
+// دالة لإعادة التوجيه إلى صفحة المنتج
+function redirectToProductPage(fileName) {
+    if (fileName) {
+        window.location.href = fileName; // الانتقال إلى صفحة HTML المرتبطة بالمنتج
+    } else {
+        alert('لا يوجد ملف مرتبط بهذا المنتج.');
+    }
+}
+
+
+
+
+
+
+// تحديث دوال التفاعلات لإيقاف الحدث ومنع التداخل
+function toggleLike(key, event) {
+    event.stopPropagation();  // إيقاف التداخل
+    const productRef = database.ref('products/' + key + '/likes/' + userId);
+    productRef.once('value').then((snapshot) => {
+        if (snapshot.val()) {
+            productRef.remove();
+        } else {
+            productRef.set(true);
+        }
+    });
+}
+
+function toggleFavorite(key, event) {
+    event.stopPropagation();  // إيقاف التداخل
+    const productRef = database.ref('products/' + key + '/favorites/' + userId);
+    productRef.once('value').then((snapshot) => {
+        if (snapshot.val()) {
+            productRef.remove();
+        } else {
+            productRef.set(true);
+        }
+    });
+}
+
+function toggleSave(key, event) {
+    event.stopPropagation();  // إيقاف التداخل
+    const productRef = database.ref('products/' + key + '/saved/' + userId);
+    productRef.once('value').then((snapshot) => {
+        if (snapshot.val()) {
+            productRef.remove();
+        } else {
+            productRef.set(true);
+        }
+    });
+}
+
+function toggleCart(key, event) {
+    event.stopPropagation();  // إيقاف التداخل
+    const productRef = database.ref('products/' + key + '/cart/' + userId);
+    productRef.once('value').then((snapshot) => {
+        if (snapshot.val()) {
+            productRef.remove();
+        } else {
+            productRef.set(true);
+        }
+    });
 }
 
 
@@ -1547,15 +1928,16 @@ window.onload = () => {
             });
         }
 
-        async function addProduct() {
+      async function addProduct() {
     const name = document.getElementById('newProductName').value;
     const imageFiles = document.getElementById('newProductImage').files;
     const priceOriginal = document.getElementById('newProductPriceOriginal').value;
     const priceDiscount = document.getElementById('newProductPriceDiscount').value;
     const priceSuperDiscount = document.getElementById('newProductPriceSuperDiscount').value;
+    const fileName = document.getElementById('newProductFileName').value;
     const category = document.getElementById('newProductCategory').value;
 
-    if (!name || imageFiles.length === 0 || !priceOriginal || !priceDiscount || !priceSuperDiscount || !category) {
+    if (!name || imageFiles.length === 0 || !priceOriginal || !priceDiscount || !priceSuperDiscount || !fileName || !category) {
         alert('الرجاء ملء جميع الحقول');
         return;
     }
@@ -1568,6 +1950,7 @@ window.onload = () => {
             priceOriginal: priceOriginal,
             priceDiscount: priceDiscount,
             priceSuperDiscount: priceSuperDiscount,
+            fileName: fileName,  // إضافة اسم ملف HTML
             category: category
         };
 
@@ -1584,6 +1967,17 @@ window.onload = () => {
         alert('خطأ في رفع الصور: ' + error);
     }
 }
+
+function redirectToProductPage(fileName) {
+    if (fileName) {
+        window.location.href = fileName;
+    } else {
+        alert('لا يوجد ملف مرتبط بهذا المنتج.');
+    }
+}
+
+
+
 function filterProductsByCategory(category) {
     const productsContainer = document.getElementById('products');
     productsContainer.innerHTML = ''; // مسح المنتجات الحالية
@@ -1740,7 +2134,7 @@ function filterProductsByCategory(category) {
             if (currentProductId && currentPrice) {
                 database.ref('products/' + currentProductId).once('value', (snapshot) => {
                     const product = snapshot.val();
-                    const cartRef = database.ref('carts/' + userId + '/' + currentProductId);
+                    const cartRef = database.ref('carts3/' + userId + '/' + currentProductId);
                     cartRef.set({
                         name: product.name,
                         images: product.images || [product.image],
@@ -1862,7 +2256,7 @@ function filterProductsByCategory(category) {
 
         function transferCartToCheckout() {
             const cartItems = [];
-            database.ref('carts/' + userId).once('value', (snapshot) => {
+            database.ref('carts3/' + userId).once('value', (snapshot) => {
                 const cart = snapshot.val();
                 if (cart) {
                     for (let productId in cart) {
@@ -1888,7 +2282,7 @@ function filterProductsByCategory(category) {
             imageElement.src = selectedImage;
 
             // تحديث الصورة المختارة في قاعدة البيانات
-            database.ref(`carts/${userId}/${productId}/selectedImage`).set(selectedImage);
+            database.ref(`carts3/${userId}/${productId}/selectedImage`).set(selectedImage);
         }
 
    // دالة تقوم بفتح الصفحة المطلوبة عند النقر على زر السلة
@@ -1903,7 +2297,7 @@ function filterProductsByCategory(category) {
     // دالة لنقل بيانات السلة إلى صفحة إتمام الشراء
     function transferCartToCheckout() {
         const cartItems = [];
-        database.ref('carts/' + userId).once('value', (snapshot) => {
+        database.ref('carts3/' + userId).once('value', (snapshot) => {
             const cart = snapshot.val();
             if (cart) {
                 for (let productId in cart) {
@@ -2061,6 +2455,19 @@ fetchProducts();
 
             // استدعاء تحديث الساعة كل ثانية
             setInterval(updateClock, 1000);
+            
+            let currentIndex = 0;
+const images = document.querySelectorAll('.carousel img');
+const totalImages = images.length;
+
+function showNextImage() {
+    images[currentIndex].classList.remove('active');
+    currentIndex = (currentIndex + 1) % totalImages;
+    images[currentIndex].classList.add('active');
+}
+
+setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
+
         </script>
     </main>
     <!-- ربط ملف الجافا سكريبت -->
