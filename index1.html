@@ -31,6 +31,10 @@
     <script src="https://unpkg.com/react/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/babel-standalone/babel.min.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+ 
+ <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
 
     
 <style>
@@ -1104,6 +1108,8 @@ select:focus {
 }
 
 
+
+
     </style>
 </head>
 <body>
@@ -1310,11 +1316,22 @@ select:focus {
    
         </div>
            
-    <!-- الإعلان (carousel) -->
-    <div class="carousel">
-        <img src="https://firebasestorage.googleapis.com/v0/b/chatapp-e6143.appspot.com/o/ads%2F1720736479851.jpg?alt=media&token=c7379cf2-1996-4ec2-bf87-2bfb48cc383e" class="active" alt="Image 1" data-url="index.html">
-        <img src="https://firebasestorage.googleapis.com/v0/b/chatapp-e6143.appspot.com/o/ads%2F1720736479851.jpg?alt=media&token=c7379cf2-1996-4ec2-bf87-2bfb48cc383e" alt="Image 2" data-url="order.html">
-        <img src="https://firebasestorage.googleapis.com/v0/b/chatapp-e6143.appspot.com/o/ads%2F1720736479851.jpg?alt=media&token=c7379cf2-1996-4ec2-bf87-2bfb48cc383e" alt="Image 3" data-url="orders.html">
+       <!-- زر إضافة إعلان جديد -->
+    <button class="popup-button" onclick="openAdPopup()">إضافة إعلان</button>
+
+    <!-- نافذة منبثقة لإضافة إعلان -->
+    <div id="adPopup" class="popup">
+        <h3>إضافة إعلان جديد</h3>
+        <input type="text" id="adName" placeholder="اسم الإعلان">
+        <input type="file" id="adImage" accept="image/*">
+        <input type="text" id="adPage" placeholder="اسم الصفحة (HTML)">
+        <button onclick="uploadAd()">رفع الإعلان</button>
+        <button onclick="closeAdPopup()">إغلاق</button>
+    </div>
+
+    <!-- الشريط الإعلاني -->
+    <div class="carousel" id="adCarousel">
+        <!-- سيتم إضافة الصور ديناميكيًا هنا -->
     </div>
 
     <!-- المنتجات -->
@@ -1410,6 +1427,116 @@ function redirectToMessagesPage() {
 
 // استدعاء الدالة عند تحميل الصفحة الرئيسية
 window.onload = fetchMessageCount;
+
+
+// فتح النافذة المنبثقة لإضافة الإعلان
+function openAdPopup() {
+    document.getElementById('adPopup').style.display = 'block';
+}
+
+// إغلاق النافذة المنبثقة
+function closeAdPopup() {
+    document.getElementById('adPopup').style.display = 'none';
+}
+
+// دالة لرفع الإعلان إلى Firebase
+function uploadAd() {
+    const adName = document.getElementById('adName').value;
+    const adPage = document.getElementById('adPage').value;
+    const adImage = document.getElementById('adImage').files[0];
+
+    if (!adName || !adPage || !adImage) {
+        alert('يرجى تعبئة جميع الحقول!');
+        return;
+    }
+
+    const storageRef = firebase.storage().ref('ad1/' + adImage.name); // المسار ad1
+    const uploadTask = storageRef.put(adImage);
+
+    uploadTask.on('state_changed', 
+        function(snapshot) {}, 
+        function(error) {
+            console.error('حدث خطأ أثناء رفع الصورة:', error);
+        }, 
+        function() {
+            uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                const adData = {
+                    name: adName,
+                    imageUrl: downloadURL,
+                    pageUrl: adPage,
+                    timestamp: Date.now()
+                };
+
+                const adRef = firebase.database().ref('ad1'); // المسار ad1
+                adRef.push(adData).then(() => {
+                    alert('تم رفع الإعلان بنجاح!');
+                    closeAdPopup(); // إغلاق النافذة بعد الرفع
+                    fetchAds(); // تحديث الشريط الإعلاني
+                }).catch((error) => {
+                    console.error('حدث خطأ أثناء حفظ بيانات الإعلان:', error);
+                });
+            });
+        }
+    );
+}
+
+// دالة لجلب الإعلانات وعرضها في الشريط الإعلاني
+// دالة لجلب الإعلانات وعرضها في الشريط الإعلاني
+function fetchAds() {
+    const adRef = firebase.database().ref('ad1').orderByChild('timestamp'); // المسار ad1
+    const carousel = document.getElementById('adCarousel');
+
+    // استرجاع الإعلانات من قاعدة البيانات
+    adRef.on('value', (snapshot) => {
+        const ads = snapshot.val();
+        if (ads) {
+            carousel.innerHTML = '';  // مسح الصور السابقة
+
+            let isFirst = true;
+            for (let key in ads) {
+                const ad = ads[key];
+                const imgElement = document.createElement('img');
+                imgElement.src = ad.imageUrl;
+                imgElement.alt = ad.name;
+                imgElement.setAttribute('data-url', ad.pageUrl);
+
+                // إضافة الفئة "active" للصورة الأولى فقط
+                if (isFirst) {
+                    imgElement.classList.add('active');
+                    isFirst = false;
+                }
+
+                carousel.appendChild(imgElement);
+
+                // إضافة حدث النقر لنقل المستخدم إلى الصفحة المحددة
+                imgElement.addEventListener('click', () => {
+                    window.location.href = ad.pageUrl;
+                });
+            }
+
+            // بعد عرض الإعلانات، تفعيل الحركة التلقائية للـ carousel
+            initializeCarousel();
+        }
+    });
+}
+
+// دالة لتحريك الـ carousel تلقائيًا
+function initializeCarousel() {
+    const images = document.querySelectorAll('.carousel img');
+    let currentIndex = 0;
+
+    setInterval(() => {
+        images[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].classList.add('active');
+    }, 5000); // تغيير الصورة كل 5 ثواني
+}
+
+// التأكد من استدعاء دالة fetchAds عند تحميل الصفحة
+window.addEventListener('load', () => {
+    fetchAds(); // استدعاء الدالة لجلب الإعلانات وعرضها فور تحميل الصفحة
+});
+
 
   
         

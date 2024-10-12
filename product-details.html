@@ -1185,6 +1185,12 @@ select:focus {
             font-size: 30px;
             cursor: pointer;
         }
+        .stock {
+    color: #ff5733; /* Custom color */
+    font-size: 1. 5rem; /* Larger font size */
+    font-weight: bold; /* Bold font */
+}
+
 
     </style>
 </head>
@@ -1354,7 +1360,9 @@ select:focus {
     <input type="number" id="newProductPriceDiscount" placeholder="سعر الخصم">
     <input type="number" id="newProductPriceSuperDiscount" placeholder="سعر الخصم الفائق">
     <input type="text" id="newProductFileName" placeholder="اسم ملف الصفحة (HTML)">
-    <select id="newProductCategory" class="custom-select">
+   <input type="number" id="newProductQuantity" placeholder="الكمية المتوفرة">
+
+     <select id="newProductCategory" class="custom-select">
         <option value="">اختر التصنيف</option>
     <option value="men-clothing">ملابس رجالي</option>
     <option value="kids-clothing">ملابس أطفال</option>
@@ -1930,6 +1938,9 @@ window.onload = () => {
         <img src="${img}" alt="${product.name}" class="product-image" style="opacity: ${index === 0 ? 1 : 0};" onclick="redirectToProductPage('${product.fileName}')">
     `).join('');
 
+    // Check if the product is out of stock
+    const isOutOfStock = product.quantity <= 0;
+
     return `
         <div class="product-card" data-product-id="${key}">
             <div class="product-images">
@@ -1942,6 +1953,11 @@ window.onload = () => {
                 <p class="price">السعر الأصلي: $${product.priceOriginal}</p>
                 <p class="price">سعر الخصم: $${product.priceDiscount}</p>
                 <p class="price">سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
+                  <!-- Update stock quantity with larger font and custom color -->
+                <p class="stock" style="color: #ff5733; font-size: 1.0rem; font-weight: bold;">
+                    الكمية المتوفرة: ${product.quantity}
+                </p>
+
                 <div class="action-buttons">
                     <button class="action-button" onclick="toggleLike('${key}')">
                         <i class="fas fa-heart ${product.likes && product.likes[userId] ? 'text-danger' : ''}"></i>
@@ -1960,11 +1976,16 @@ window.onload = () => {
                         <span class="action-count">${countObjectProperties(product.cart)}</span>
                     </button>
                 </div>
-                <button class="buy-button" onclick="showPricePopup('${key}')">شراء الآن</button>
+
+                <!-- Show "Buy" button if the product is in stock, otherwise hide it -->
+                <button class="buy-button" ${isOutOfStock ? 'style="display:none;"' : ''} onclick="showPricePopup('${key}')">
+                    شراء الآن
+                </button>
             </div>
         </div>
     `;
 }
+
 
 // دالة لإعادة التوجيه إلى صفحة المنتج
 function redirectToProductPage(fileName) {
@@ -2119,8 +2140,9 @@ function toggleCart(key, event) {
     const priceSuperDiscount = document.getElementById('newProductPriceSuperDiscount').value;
     const fileName = document.getElementById('newProductFileName').value;
     const category = document.getElementById('newProductCategory').value;
+    const quantity = document.getElementById('newProductQuantity').value;  // Add quantity field
 
-    if (!name || imageFiles.length === 0 || !priceOriginal || !priceDiscount || !priceSuperDiscount || !fileName || !category) {
+    if (!name || imageFiles.length === 0 || !priceOriginal || !priceDiscount || !priceSuperDiscount || !fileName || !category || !quantity) {
         alert('الرجاء ملء جميع الحقول');
         return;
     }
@@ -2133,8 +2155,9 @@ function toggleCart(key, event) {
             priceOriginal: priceOriginal,
             priceDiscount: priceDiscount,
             priceSuperDiscount: priceSuperDiscount,
-            fileName: fileName,  // إضافة اسم ملف HTML
-            category: category
+            fileName: fileName,  // Include HTML file name
+            category: category,
+            quantity: parseInt(quantity)  // Store quantity as a number
         };
 
         database.ref('products').push(newProduct, function (error) {
@@ -2143,7 +2166,7 @@ function toggleCart(key, event) {
             } else {
                 alert('تمت إضافة المنتج بنجاح!');
                 toggleAddProductForm();
-                filterProductsByCategory(category); // تحديث العرض بعد إضافة المنتج
+                filterProductsByCategory(category); // Refresh view after adding the product
             }
         });
     } catch (error) {
@@ -2313,31 +2336,58 @@ function filterProductsByCategory(category) {
             });
         }
 
-        function addToCart() {
-            if (currentProductId && currentPrice) {
-                database.ref('products/' + currentProductId).once('value', (snapshot) => {
-                    const product = snapshot.val();
-                    const cartRef = database.ref('carts/' + userId + '/' + currentProductId);
-                    cartRef.set({
-                        name: product.name,
-                        images: product.images || [product.image],
-                        price: currentPrice,
-                        priceOriginal: product.priceOriginal,
-                        priceDiscount: product.priceDiscount,
-                        priceSuperDiscount: product.priceSuperDiscount,
-                        timestamp: Date.now()
-                    }, (error) => {
-                        if (error) {
-                            alert('حدث خطأ أثناء إضافة المنتج إلى السلة.');
-                        } else {
-                            alert('تمت إضافة المنتج إلى السلة بنجاح!');
-                            closePopup();
-                            updateCartCount();
+    function addToCart() {
+    if (currentProductId && currentPrice) {
+        const productRef = database.ref('products/' + currentProductId);
+
+        // Fetch the current product data from Firebase
+        productRef.once('value').then((snapshot) => {
+            const product = snapshot.val();
+            if (product.quantity > 0) {
+                const newQuantity = product.quantity - 1;  // Decrease the quantity
+
+                // Update the cart entry in Firebase
+                const cartRef = database.ref('carts/' + userId + '/' + currentProductId);
+                cartRef.set({
+                    name: product.name,
+                    images: product.images || [product.image],
+                    price: currentPrice,
+                    priceOriginal: product.priceOriginal,
+                    priceDiscount: product.priceDiscount,
+                    priceSuperDiscount: product.priceSuperDiscount,
+                    timestamp: Date.now()
+                }, (error) => {
+                    if (error) {
+                        alert('حدث خطأ أثناء إضافة المنتج إلى السلة.');
+                    } else {
+                        // Update the product quantity in the database
+                        productRef.update({ quantity: newQuantity });
+
+                        // Update the product UI (quantity and "Buy" button visibility)
+                        const productCard = document.querySelector(`.product-card[data-product-id="${currentProductId}"]`);
+                        const stockElement = productCard.querySelector('.stock');
+                        const buyButton = productCard.querySelector('.buy-button');
+                        
+                        // Update stock display in the UI
+                        stockElement.textContent = `الكمية المتوفرة: ${newQuantity}`;
+
+                        // Hide the "Buy" button if stock is 0
+                        if (newQuantity <= 0) {
+                            buyButton.style.display = 'none';
                         }
-                    });
+
+                        // Close the popup and show a success message
+                        alert('تمت إضافة المنتج إلى السلة بنجاح!');
+                        closePopup();
+                        updateCartCount();
+                    }
                 });
+            } else {
+                alert('المنتج غير متوفر.');
             }
-        }
+        });
+    }
+}
 
         function redirectToPurchase(productId) {
             // استرجاع تفاصيل المنتج من قاعدة البيانات
