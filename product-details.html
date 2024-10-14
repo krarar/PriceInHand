@@ -39,17 +39,18 @@
     
 <style>
     :root {
-    --primary-color: #2C3E50; /* لون أساسي: أزرق داكن */
-    --secondary-color: #27AE60; /* لون ثانوي: أخضر داكن */
-    --accent-color: #F39C12; /* لون تمييز: برتقالي */
-    --text-color: #2C3E50; /* لون النص: أزرق داكن */
-    --background-color: #ECF0F1; /* لون الخلفية: رمادي فاتح */
-    --card-background: #FFFFFF; /* لون خلفية البطاقة: أبيض */
-    --header-background: #34495E; /* لون خلفية العنوان: أزرق رمادي */
-    --header-text: #ECF0F1; /* لون نص العنوان: رمادي فاتح */
-    --shadow-color: rgba(0, 0, 0, 0.1); /* لون الظل: أسود شفاف */
-    --button-hover-color: #E67E22; /* لون الأزرار عند التمرير: برتقالي داكن */
+    --primary-color: #2E1A47; /* Dark purple matching the nebula */
+    --secondary-color: #8B4896; /* Soft purple accent from the nebula */
+    --accent-color: #FFD700; /* Golden yellow for contrast with the dark background */
+    --text-color: #FFFFFF; /* White text to stand out against dark colors */
+    --background-color: #0A0014; /* Very dark purple, almost black */
+    --card-background: #2E1A47; /* Darker shade of purple for card backgrounds */
+    --header-background: #27053C; /* Deep space purple for headers */
+    --header-text: #FFFFFF; /* White for clear readability */
+    --shadow-color: rgba(255, 255, 255, 0.2); /* Soft white shadow for depth */
+    --button-hover-color: #DDA0DD; /* Light lavender for hover effect */
 }
+
 
 
 body {
@@ -59,7 +60,7 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     transition: background-color 0.3s ease;
-    background-image: url('https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2F593511e371818efcc7f0005167189589.jpg?alt=media&token=c2ad9a26-04a4-4dac-9838-c781338cb454');
+    background-image: url('https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2Fpngwing.com%20(1).png?alt=media&token=f4b65dff-469f-4466-9e2b-9fb5f1e54119');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -1090,7 +1091,7 @@ select:focus {
     left: 0; /* المسافة من اليسار */
     margin: 10px; /* إضافة مسافة خارجية اختيارية */
     padding: 0px; /* المسافة الداخلية حول المحتوى */
-    background-color: #34495E; /* يمكنك تعديل لون الخلفية إذا أردت */
+    background-color: #2E1A47; /* يمكنك تعديل لون الخلفية إذا أردت */
     color: white; /* لون النص */
     z-index: 1000; /* للتأكد من أن العنصر يبقى فوق جميع العناصر الأخرى */
     border-radius: 10px; /* حواف مستديرة للعنصر */
@@ -1109,7 +1110,7 @@ select:focus {
 
 /* المتغيرات للتحكم الكامل */
 :root {
-  --button-bg-color: #2C3E50;      /* لون الزر */
+  --button-bg-color: #2E1A47;      /* لون الزر */
   --button-hover-color: #2C3E50;   /* لون الزر عند التمرير */
   --button-size: 3rem;             /* حجم الزر */
   --button-padding: 0.5rem;        /* المسافة الداخلية */
@@ -1190,6 +1191,46 @@ select:focus {
   padding: 0.2rem 0.5rem;
   font-size: 0.75rem;
 }
+
+.popup {
+    background-color: #f5f5f5; /* لون خلفية خفيف */
+    border-radius: 10px; /* زوايا دائرية للنافذة */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* ظل لخلق عمق */
+    padding: 20px; /* مسافة داخلية لتنسيق المحتوى */
+    max-width: 500px; /* تحديد العرض الأقصى */
+    margin: 0 auto; /* جعل النافذة في المنتصف */
+}
+
+.popup h2 {
+    color: #333; /* لون نص العنوان */
+    font-size: 24px; /* حجم العنوان */
+    text-align: center; /* توسيط العنوان */
+    margin-bottom: 20px;
+}
+
+.popup p {
+    color: #555; /* لون النص */
+    font-size: 16px; /* حجم النص */
+    line-height: 1.5; /* تباعد بين الأسطر */
+}
+
+.popup button {
+    background-color: #008CBA; /* لون زر الشراء */
+    color: white; /* لون النص في الزر */
+    padding: 10px 20px; /* حشوة داخل الزر */
+    border: none; /* إزالة الحدود */
+    border-radius: 5px; /* زوايا دائرية للزر */
+    cursor: pointer;
+    font-size: 18px;
+    display: block;
+    margin: 20px auto 0; /* توسيط الزر */
+}
+
+.popup button:hover {
+    background-color: #005f73; /* لون عند مرور المؤشر */
+}
+
+
 
 
     </style>
@@ -2042,7 +2083,7 @@ window.onload = () => {
         }
 
         // Update the fetchProducts function to also update the cart count
-       function createProductCard(key, product) {
+      function createProductCard(key, product) {
     const images = product.images || [product.image];
     const imagesHtml = images.map((img, index) => `
         <img src="${img}" alt="${product.name}" class="product-image" style="opacity: ${index === 0 ? 1 : 0};" onclick="redirectToProductPage('${product.fileName}')">
@@ -2059,31 +2100,39 @@ window.onload = () => {
                 <button class="image-nav next" onclick="changeImage('${key}', 1)">❯</button>
             </div>
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p class="price">السعر الأصلي: $${product.priceOriginal}</p>
-                <p class="price">سعر الخصم: $${product.priceDiscount}</p>
-                <p class="price">سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
-                  <!-- Update stock quantity with larger font and custom color -->
-                <p class="stock" style="color: #ff5733; font-size: 1.0rem; font-weight: bold;">
+                <!-- Product name with accent color -->
+                <h3 style="color: var(--accent-color);">${product.name}</h3>
+                
+                <!-- Prices with separate styles -->
+                <p class="price" style="color: #FF6F61;">السعر الأصلي: $${product.priceOriginal}</p>
+                <p class="price" style="color: #FFD700;">سعر الخصم: $${product.priceDiscount}</p>
+                <p class="price" style="color: #8B4896;">سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
+
+                <!-- Update stock quantity with larger font and custom color -->
+                <p class="stock" style="color: #FF5733; font-size: 1.0rem; font-weight: bold;">
                     الكمية المتوفرة: ${product.quantity}
                 </p>
 
                 <div class="action-buttons">
+                    <!-- Like button with custom color -->
                     <button class="action-button" onclick="toggleLike('${key}')">
-                        <i class="fas fa-heart ${product.likes && product.likes[userId] ? 'text-danger' : ''}"></i>
-                        <span class="action-count">${countObjectProperties(product.likes)}</span>
+                        <i class="fas fa-heart ${product.likes && product.likes[userId] ? 'text-danger' : ''}" style="color: #FF6F61;"></i>
+                        <span class="action-count" style="color: #FF6F61;">${countObjectProperties(product.likes)}</span>
                     </button>
+                    <!-- Favorite button with custom color -->
                     <button class="action-button" onclick="toggleFavorite('${key}')">
-                        <i class="fas fa-star ${product.favorites && product.favorites[userId] ? 'text-warning' : ''}"></i>
-                        <span class="action-count">${countObjectProperties(product.favorites)}</span>
+                        <i class="fas fa-star ${product.favorites && product.favorites[userId] ? 'text-warning' : ''}" style="color: #FFD700;"></i>
+                        <span class="action-count" style="color: #FFD700;">${countObjectProperties(product.favorites)}</span>
                     </button>
+                    <!-- Save button with custom color -->
                     <button class="action-button" onclick="toggleSave('${key}')">
-                        <i class="fas fa-bookmark ${product.saved && product.saved[userId] ? 'text-primary' : ''}"></i>
-                        <span class="action-count">${countObjectProperties(product.saved)}</span>
+                        <i class="fas fa-bookmark ${product.saved && product.saved[userId] ? 'text-primary' : ''}" style="color: #3498DB;"></i>
+                        <span class="action-count" style="color: #3498DB;">${countObjectProperties(product.saved)}</span>
                     </button>
+                    <!-- Cart button with custom color -->
                     <button class="action-button" onclick="toggleCart('${key}')">
-                        <i class="fas fa-shopping-cart ${product.cart && product.cart[userId] ? 'text-success' : ''}"></i>
-                        <span class="action-count">${countObjectProperties(product.cart)}</span>
+                        <i class="fas fa-shopping-cart ${product.cart && product.cart[userId] ? 'text-success' : ''}" style="color: #2ECC71;"></i>
+                        <span class="action-count" style="color: #2ECC71;">${countObjectProperties(product.cart)}</span>
                     </button>
                 </div>
 
@@ -2095,7 +2144,6 @@ window.onload = () => {
         </div>
     `;
 }
-
 
 // دالة لإعادة التوجيه إلى صفحة المنتج
 function redirectToProductPage(fileName) {
