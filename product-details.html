@@ -1493,22 +1493,28 @@ select:focus {
         firebase.database().ref('users/' + userId).set({ id: userId });
     }
 
-    // إنشاء رقم عشوائي
-    function generateRandomCode() {
-        return Math.floor(100000 + Math.random() * 900000); // إنشاء رقم مكون من 6 أرقام عشوائية
+    // توليد رقم عشوائي ثابت إذا لم يكن موجودًا بالفعل في قاعدة البيانات
+    function generateAndSaveRandomCode() {
+        firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
+            const data = snapshot.val();
+            if (!data.randomCode) {
+                // إذا لم يكن الرمز العشوائي موجودًا، أنشئ رمزًا جديدًا واحفظه
+                const randomCode = Math.floor(100000 + Math.random() * 900000); // إنشاء رقم مكون من 6 أرقام عشوائية
+                firebase.database().ref('users/' + userId).update({ randomCode: randomCode });
+            }
+        });
     }
 
-    // تخزين الرمز العشوائي في قاعدة البيانات فقط عند النقر على زر "التواصل مع المسؤول"
+    // إرسال رسالة ترحيب فقط عبر واتساب عند النقر على زر "التواصل مع المسؤول"
     function contactAdmin() {
-        const randomCode = generateRandomCode();
-        // حفظ الرمز العشوائي في قاعدة البيانات Firebase للمستخدم الحالي
-        firebase.database().ref('users/' + userId).update({ randomCode: randomCode }).then(() => {
-            // إرسال رسالة ترحيب إلى واتساب بدون الرمز العشوائي
-            const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
-            const message = `مرحبًا! لقد طلب العميل المساعدة. يرجى التواصل معه.`;
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-            window.location.href = whatsappUrl; // فتح رابط واتساب وإرسال الرسالة
-        });
+        // استدعاء دالة إنشاء وحفظ الرمز العشوائي إذا لم يكن موجودًا
+        generateAndSaveRandomCode();
+
+        // إرسال رسالة ترحيب فقط إلى المسؤول عبر واتساب
+        const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
+        const message = `مرحبًا! لقد طلب العميل المساعدة. يرجى التواصل معه.`;
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.location.href = whatsappUrl; // فتح رابط واتساب وإرسال الرسالة
     }
 
     // إظهار النافذة المنبثقة لطلب الرمز التعريفي
@@ -1519,16 +1525,16 @@ select:focus {
         }
     }
 
-    // التحقق من الرمز التعريفي
+    // التحقق من الرمز التعريفي الذي تم إدخاله من قاعدة البيانات
     function verifyCode() {
         const enteredCode = document.getElementById('userCode').value;
 
-        // التحقق من قاعدة بيانات Firebase
+        // التحقق من الرمز العشوائي من قاعدة بيانات Firebase
         firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
             const storedRandomCode = snapshot.val().randomCode;
 
             // التحقق من الرمز المدخل
-            if (enteredCode === storedRandomCode) {
+            if (enteredCode === storedRandomCode.toString()) {
                 alert('تم التحقق بنجاح! يمكنك المتابعة.');
                 document.getElementById('popup').style.display = 'none'; // إخفاء النافذة المنبثقة
                 localStorage.setItem('isCodeVerified', true); // تخزين الحالة كتم التحقق
@@ -1548,6 +1554,7 @@ select:focus {
 
     // عرض النافذة المنبثقة إذا كانت الحالة غير متحققة
     showPopup();
+
 
 
 
