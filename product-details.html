@@ -1498,19 +1498,14 @@ select:focus {
         return Math.floor(100000 + Math.random() * 900000); // إنشاء رقم مكون من 6 أرقام عشوائية
     }
 
-    // تخزين الرمز العشوائي في localStorage عند إنشائه
-    if (!localStorage.getItem('randomCode')) {
-        const randomCode = generateRandomCode();
-        localStorage.setItem('randomCode', randomCode);
-    }
-
-    // إرسال الرمز العشوائي إلى قاعدة البيانات ثم إلى واتساب عند النقر على زر "التواصل مع المسؤول"
+    // تخزين الرمز العشوائي في قاعدة البيانات فقط عند النقر على زر "التواصل مع المسؤول"
     function contactAdmin() {
-        const randomCode = localStorage.getItem('randomCode');
-        // تحديث قاعدة البيانات برمز المستخدم العشوائي
+        const randomCode = generateRandomCode();
+        // حفظ الرمز العشوائي في قاعدة البيانات Firebase للمستخدم الحالي
         firebase.database().ref('users/' + userId).update({ randomCode: randomCode }).then(() => {
+            // إرسال رسالة ترحيب إلى واتساب بدون الرمز العشوائي
             const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
-            const message = `مرحبا! الرجاء إرسال الرمز العشوائي: ${randomCode} إلى المسؤول للحصول على المساعدة.`;
+            const message = `مرحبًا! لقد طلب العميل المساعدة. يرجى التواصل معه.`;
             const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
             window.location.href = whatsappUrl; // فتح رابط واتساب وإرسال الرسالة
         });
@@ -1550,6 +1545,12 @@ select:focus {
         // على سبيل المثال: إعادة توجيه المستخدم إلى الصفحة الرئيسية أو إزالة القيود
         window.location.href = 'home.html'; // إعادة توجيه المستخدم إلى الصفحة الرئيسية
     }
+
+    // عرض النافذة المنبثقة إذا كانت الحالة غير متحققة
+    showPopup();
+
+
+
 
     // عرض النافذة المنبثقة إذا كانت الحالة غير متحققة
     showPopup();
