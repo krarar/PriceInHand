@@ -1453,246 +1453,74 @@ select:focus {
 
     
     </div>
-<div id="popup" class="popup" style="display:none;">
-    <h2>أدخل الرمز التعريفي الخاص بك</h2>
-    <input type="text" id="userCode" placeholder="الرمز التعريفي">
-    <button onclick="verifyCode()">إرسال</button>
-    <button onclick="contactAdmin()">تواصل مع المسؤول</button>
-</div>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
+            authDomain: "messageemeapp.firebaseapp.com",
+            databaseURL: "https://messageemeapp-default-rtdb.firebaseio.com",
+            projectId: "messageemeapp",
+            storageBucket: "messageemeapp.appspot.com",
+            messagingSenderId: "255034474844",
+            appId: "1:255034474844:web:5e3b7a6bc4b2fb94cc4199"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        const storage = firebase.storage();
 
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
-        authDomain: "messageemeapp.firebaseapp.com",
-        databaseURL: "https://messageemeapp-default-rtdb.firebaseio.com",
-        projectId: "messageemeapp",
-        storageBucket: "messageemeapp.appspot.com",
-        messagingSenderId: "255034474844",
-        appId: "1:255034474844:web:5e3b7a6bc4b2fb94cc4199"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const database = firebase.database();
-    const storage = firebase.storage();
-
-    // تتبع عدد مرات فتح التطبيق
-    let openCount = localStorage.getItem('openCount') || 0;
-    openCount++;
-    localStorage.setItem('openCount', openCount);
-
-    // إنشاء معرف فريد لكل مستخدم
-    let userId = localStorage.getItem('userId');
-    if (!userId) {
-        userId = 'user_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('userId', userId);
-        // حفظ المعرف في Firebase
-        firebase.database().ref('users/' + userId).set({ id: userId });
-    }
-
-    // إنشاء رقم عشوائي
-    function generateRandomCode() {
-        return Math.floor(100000 + Math.random() * 900000); // إنشاء رقم مكون من 6 أرقام عشوائية
-    }
-
-    // تخزين الرمز العشوائي في localStorage عند إنشائه
-    if (!localStorage.getItem('randomCode')) {
-        const randomCode = generateRandomCode();
-        localStorage.setItem('randomCode', randomCode);
-    }
-
-    // إرسال الرمز العشوائي إلى المسؤول عبر واتساب عند النقر على زر "التواصل مع المسؤول"
-    function contactAdmin() {
-        const randomCode = localStorage.getItem('randomCode');
-        const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
-        const message = `الرمز العشوائي لهذا المستخدم هو: ${randomCode}`;
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        window.location.href = whatsappUrl; // فتح رابط واتساب وإرسال الرسالة
-    }
-
-    // إظهار النافذة المنبثقة لطلب الرمز التعريفي
-    function showPopup() {
-        // تحقق مما إذا تم إدخال الرمز مسبقًا
-        if (!localStorage.getItem('isCodeVerified')) {
-            document.getElementById('popup').style.display = 'block';
+        let userId = localStorage.getItem('userId');
+        if (!userId) {
+            userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('userId', userId);
         }
-    }
 
-    // التحقق من الرمز التعريفي
-    function verifyCode() {
-        const enteredCode = document.getElementById('userCode').value;
-        const storedRandomCode = localStorage.getItem('randomCode'); // الرمز المخزن في localStorage
+        let currentLanguage = 'ar';
+        let isDarkMode = false;
+        let currentProductId = null;
+        let currentPrice = null;
+        
+        let stories = [];
+        let currentStoryIndex = 0;
 
-        // التحقق مما إذا كان الرمز المدخل مطابقًا للرمز المرسل للمسؤول
-        if (enteredCode === storedRandomCode) {
-            alert('تم التحقق بنجاح! يمكنك المتابعة.');
-            document.getElementById('popup').style.display = 'none'; // إخفاء النافذة المنبثقة
-            localStorage.setItem('isCodeVerified', true); // تخزين الحالة كتم التحقق
-            openApp(); // فتح التطبيق بصورة طبيعية
-        } else {
-            alert('الرمز غير صحيح. حاول مرة أخرى.');
-        }
-    }
+      function loadStories() {
+    const container = document.getElementById('stories-container');
+    container.innerHTML = '';
+    stories = [];
 
-    // فتح التطبيق بعد التحقق
-    function openApp() {
-        // هنا يمكنك تنفيذ ما تراه مناسبًا لفتح التطبيق بشكل طبيعي
-        // على سبيل المثال: إعادة توجيه المستخدم إلى الصفحة الرئيسية أو إزالة القيود
-        window.location.href = 'home.html'; // إعادة توجيه المستخدم إلى الصفحة الرئيسية
-    }
+    const addStoryElement = document.createElement('div');
+    addStoryElement.className = 'add-story';
+    addStoryElement.innerHTML = `
+        <div class="add-story-content">+</div>
+        <p>إضافة قصة</p>
+    `;
+    container.appendChild(addStoryElement);
+    addStoryElement.addEventListener('click', addStory);
 
-    // عرض النافذة المنبثقة إذا كانت الحالة غير متحققة
-    showPopup();
+    // استرجاع القصص من قاعدة البيانات
+    firebase.database().ref('stories/' + userId).once('value', (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            const storyData = childSnapshot.val();
+            const storyElement = document.createElement('div');
+            storyElement.className = 'story';
+            storyElement.dataset.video = storyData.videoUrl;
+            storyElement.innerHTML = `
+                <div class="story-border"></div>
+                <div class="story-content">
+                    <video src="${storyData.videoUrl}" muted loop playsinline></video>
+                </div>
+                <p>قصتك</p>
+            `;
+            container.appendChild(storyElement);
+            stories.push({ url: storyData.videoUrl });
 
-
-<div id="popup" class="popup" style="display:none;">
-    <h2>أدخل الرمز التعريفي الخاص بك</h2>
-    <input type="text" id="userCode" placeholder="الرمز التعريفي">
-    <button onclick="verifyCode()">إرسال</button>
-    <button onclick="contactAdmin()">مراسلة المسؤول</button>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
-        authDomain: "messageemeapp.firebaseapp.com",
-        databaseURL: "https://messageemeapp-default-rtdb.firebaseio.com",
-        projectId: "messageemeapp",
-        storageBucket: "messageemeapp.appspot.com",
-        messagingSenderId: "255034474844",
-        appId: "1:255034474844:web:5e3b7a6bc4b2fb94cc4199"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // تتبع عدد مرات فتح التطبيق
-    let openCount = localStorage.getItem('openCount') || 0;
-    openCount++;
-    localStorage.setItem('openCount', openCount);
-
-    // إنشاء معرف فريد لكل مستخدم
-    let userId = localStorage.getItem('userId');
-    if (!userId) {
-        userId = 'user_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('userId', userId);
-        // حفظ المعرف في Firebase
-        firebase.database().ref('users/' + userId).set({ id: userId });
-    }
-
-    // إنشاء رقم عشوائي
-    function generateRandomCode() {
-        return Math.floor(100000 + Math.random() * 900000); // إنشاء رقم مكون من 6 أرقام عشوائية
-    }
-
-    // تخزين الرمز العشوائي في قاعدة بيانات Firebase وفتح واتساب
-    function contactAdmin() {
-        const randomCode = generateRandomCode();
-        localStorage.setItem('randomCode', randomCode);
-
-        // حفظ الرمز في Firebase
-        firebase.database().ref('users/' + userId).update({ randomCode: randomCode });
-
-        // إرسال رسالة واتساب مع الترحيب والرمز العشوائي
-        const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
-        const message = `مرحباً، لقد قمت بفتح التطبيق وأحتاج إلى مساعدتك. هذا هو الرمز العشوائي الخاص بي: ${randomCode}`;
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        window.location.href = whatsappUrl; // فتح رابط واتساب وإرسال الرسالة
-    }
-
-    // إظهار النافذة المنبثقة لطلب الرمز التعريفي
-    function showPopup() {
-        if (!localStorage.getItem('isCodeVerified')) {
-            document.getElementById('popup').style.display = 'block';
-        }
-    }
-
-    // التحقق من الرمز التعريفي
-    function verifyCode() {
-        const enteredCode = document.getElementById('userCode').value;
-
-        // جلب الرمز العشوائي من Firebase
-        firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
-            const storedRandomCode = snapshot.val().randomCode;
-
-            // التحقق مما إذا كان الرمز المدخل مطابقًا للرمز المخزن
-            if (enteredCode === storedRandomCode) {
-                alert('تم التحقق بنجاح! يمكنك المتابعة.');
-                document.getElementById('popup').style.display = 'none'; // إخفاء النافذة المنبثقة
-                localStorage.setItem('isCodeVerified', true); // تخزين الحالة كتم التحقق
-                openApp(); // فتح التطبيق بصورة طبيعية
-            } else {
-                alert('الرمز غير صحيح. حاول مرة أخرى.');
-            }
+            storyElement.addEventListener('click', () => openStoryModal(stories.length - 1));
         });
-    }
-
-    // فتح التطبيق بعد التحقق
-    function openApp() {
-        window.location.href = 'home.html'; // إعادة توجيه المستخدم إلى الصفحة الرئيسية
-    }
-
-    // عرض النافذة المنبثقة إذا كانت الحالة غير متحققة
-    showPopup();
-
-
-
-
-
-    // إعدادات أخرى متعلقة بالتطبيق
-    let currentLanguage = 'ar';
-    let isDarkMode = false;
-    let currentProductId = null;
-    let currentPrice = null;
-    
-    let stories = [];
-    let currentStoryIndex = 0;
-
-    // تحميل القصص من قاعدة البيانات
-    function loadStories() {
-        const container = document.getElementById('stories-container');
-        container.innerHTML = '';
-        stories = [];
-
-        const addStoryElement = document.createElement('div');
-        addStoryElement.className = 'add-story';
-        addStoryElement.innerHTML = `
-            <div class="add-story-content">+</div>
-            <p>إضافة قصة</p>
-        `;
-        container.appendChild(addStoryElement);
-        addStoryElement.addEventListener('click', addStory);
-
-        // استرجاع القصص من قاعدة البيانات
-        firebase.database().ref('stories/' + userId).once('value', (snapshot) => {
-            snapshot.forEach((childSnapshot) => {
-                const storyData = childSnapshot.val();
-                const storyElement = document.createElement('div');
-                storyElement.className = 'story';
-                storyElement.dataset.video = storyData.videoUrl;
-                storyElement.innerHTML = `
-                    <div class="story-border"></div>
-                    <div class="story-content">
-                        <video src="${storyData.videoUrl}" muted loop playsinline></video>
-                    </div>
-                    <p>قصتك</p>
-                `;
-                container.appendChild(storyElement);
-                stories.push({ url: storyData.videoUrl });
-
-                storyElement.addEventListener('click', () => openStoryModal(stories.length - 1));
-            });
-        });
-    }
-
-
-
+    });
+}
 /// دالة لفتح وإغلاق القائمة المنبثقة عند النقر على الزر
 let firstClick = true; // متغير لتتبع النقرات
 
