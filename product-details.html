@@ -1192,45 +1192,6 @@ select:focus {
   font-size: 0.75rem;
 }
 
-.popup {
-    background-color: #f5f5f5; /* لون خلفية خفيف */
-    border-radius: 10px; /* زوايا دائرية للنافذة */
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* ظل لخلق عمق */
-    padding: 20px; /* مسافة داخلية لتنسيق المحتوى */
-    max-width: 500px; /* تحديد العرض الأقصى */
-    margin: 0 auto; /* جعل النافذة في المنتصف */
-}
-
-.popup h2 {
-    color: #333; /* لون نص العنوان */
-    font-size: 24px; /* حجم العنوان */
-    text-align: center; /* توسيط العنوان */
-    margin-bottom: 20px;
-}
-
-.popup p {
-    color: #555; /* لون النص */
-    font-size: 16px; /* حجم النص */
-    line-height: 1.5; /* تباعد بين الأسطر */
-}
-
-.popup button {
-    background-color: #008CBA; /* لون زر الشراء */
-    color: white; /* لون النص في الزر */
-    padding: 10px 20px; /* حشوة داخل الزر */
-    border: none; /* إزالة الحدود */
-    border-radius: 5px; /* زوايا دائرية للزر */
-    cursor: pointer;
-    font-size: 18px;
-    display: block;
-    margin: 20px auto 0; /* توسيط الزر */
-}
-
-.popup button:hover {
-    background-color: #005f73; /* لون عند مرور المؤشر */
-}
-
-
 
 
     </style>
@@ -1492,74 +1453,123 @@ select:focus {
 
     
     </div>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
-            authDomain: "messageemeapp.firebaseapp.com",
-            databaseURL: "https://messageemeapp-default-rtdb.firebaseio.com",
-            projectId: "messageemeapp",
-            storageBucket: "messageemeapp.appspot.com",
-            messagingSenderId: "255034474844",
-            appId: "1:255034474844:web:5e3b7a6bc4b2fb94cc4199"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
-        const storage = firebase.storage();
+  <div id="popup" class="popup" style="display:none;">
+    <h2>أدخل الرمز التعريفي الخاص بك</h2>
+    <input type="text" id="userCode" placeholder="الرمز التعريفي">
+    <button onclick="verifyCode()">إرسال</button>
+    <button onclick="contactAdmin()">تواصل مع المسؤول</button>
+</div>
 
-        let userId = localStorage.getItem('userId');
-        if (!userId) {
-            userId = 'user_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('userId', userId);
-        }
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
+        authDomain: "messageemeapp.firebaseapp.com",
+        databaseURL: "https://messageemeapp-default-rtdb.firebaseio.com",
+        projectId: "messageemeapp",
+        storageBucket: "messageemeapp.appspot.com",
+        messagingSenderId: "255034474844",
+        appId: "1:255034474844:web:5e3b7a6bc4b2fb94cc4199"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+    const storage = firebase.storage();
 
-        let currentLanguage = 'ar';
-        let isDarkMode = false;
-        let currentProductId = null;
-        let currentPrice = null;
-        
-        let stories = [];
-        let currentStoryIndex = 0;
+    // تتبع عدد مرات فتح التطبيق
+    let openCount = localStorage.getItem('openCount') || 0;
+    openCount++;
+    localStorage.setItem('openCount', openCount);
 
-      function loadStories() {
-    const container = document.getElementById('stories-container');
-    container.innerHTML = '';
-    stories = [];
+    // إذا تم فتح التطبيق أكثر من 5 مرات، أظهر النافذة المنبثقة
+    if (openCount > 5) {
+        showPopup();
+    }
 
-    const addStoryElement = document.createElement('div');
-    addStoryElement.className = 'add-story';
-    addStoryElement.innerHTML = `
-        <div class="add-story-content">+</div>
-        <p>إضافة قصة</p>
-    `;
-    container.appendChild(addStoryElement);
-    addStoryElement.addEventListener('click', addStory);
+    // إنشاء معرف فريد لكل مستخدم
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+        userId = 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('userId', userId);
+        // حفظ المعرف في Firebase
+        firebase.database().ref('users/' + userId).set({ id: userId });
+    }
 
-    // استرجاع القصص من قاعدة البيانات
-    firebase.database().ref('stories/' + userId).once('value', (snapshot) => {
-        snapshot.forEach((childSnapshot) => {
-            const storyData = childSnapshot.val();
-            const storyElement = document.createElement('div');
-            storyElement.className = 'story';
-            storyElement.dataset.video = storyData.videoUrl;
-            storyElement.innerHTML = `
-                <div class="story-border"></div>
-                <div class="story-content">
-                    <video src="${storyData.videoUrl}" muted loop playsinline></video>
-                </div>
-                <p>قصتك</p>
-            `;
-            container.appendChild(storyElement);
-            stories.push({ url: storyData.videoUrl });
+    // إظهار النافذة المنبثقة لطلب الرمز التعريفي
+    function showPopup() {
+        document.getElementById('popup').style.display = 'block';
+    }
 
-            storyElement.addEventListener('click', () => openStoryModal(stories.length - 1));
+    // التحقق من الرمز التعريفي
+    function verifyCode() {
+        const enteredCode = document.getElementById('userCode').value;
+        firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
+            const storedCode = snapshot.val().id;
+            if (enteredCode === storedCode) {
+                alert('تم التحقق بنجاح!');
+                document.getElementById('popup').style.display = 'none'; // إخفاء النافذة المنبثقة
+            } else {
+                alert('الرمز غير صحيح.');
+            }
         });
-    });
-}
+    }
+
+    // زر التواصل مع المسؤول عبر واتساب
+    function contactAdmin() {
+        window.location.href = 'https://wa.me/9647813798636'; // الرابط للتواصل عبر واتساب
+    }
+
+    // إعدادات أخرى متعلقة بالتطبيق
+    let currentLanguage = 'ar';
+    let isDarkMode = false;
+    let currentProductId = null;
+    let currentPrice = null;
+    
+    let stories = [];
+    let currentStoryIndex = 0;
+
+    // تحميل القصص من قاعدة البيانات
+    function loadStories() {
+        const container = document.getElementById('stories-container');
+        container.innerHTML = '';
+        stories = [];
+
+        const addStoryElement = document.createElement('div');
+        addStoryElement.className = 'add-story';
+        addStoryElement.innerHTML = `
+            <div class="add-story-content">+</div>
+            <p>إضافة قصة</p>
+        `;
+        container.appendChild(addStoryElement);
+        addStoryElement.addEventListener('click', addStory);
+
+        // استرجاع القصص من قاعدة البيانات
+        firebase.database().ref('stories/' + userId).once('value', (snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                const storyData = childSnapshot.val();
+                const storyElement = document.createElement('div');
+                storyElement.className = 'story';
+                storyElement.dataset.video = storyData.videoUrl;
+                storyElement.innerHTML = `
+                    <div class="story-border"></div>
+                    <div class="story-content">
+                        <video src="${storyData.videoUrl}" muted loop playsinline></video>
+                    </div>
+                    <p>قصتك</p>
+                `;
+                container.appendChild(storyElement);
+                stories.push({ url: storyData.videoUrl });
+
+                storyElement.addEventListener('click', () => openStoryModal(stories.length - 1));
+            });
+        });
+    }
+
+
+
 /// دالة لفتح وإغلاق القائمة المنبثقة عند النقر على الزر
 let firstClick = true; // متغير لتتبع النقرات
 
@@ -2083,7 +2093,7 @@ window.onload = () => {
         }
 
         // Update the fetchProducts function to also update the cart count
-      function createProductCard(key, product) {
+       function createProductCard(key, product) {
     const images = product.images || [product.image];
     const imagesHtml = images.map((img, index) => `
         <img src="${img}" alt="${product.name}" class="product-image" style="opacity: ${index === 0 ? 1 : 0};" onclick="redirectToProductPage('${product.fileName}')">
@@ -2100,39 +2110,31 @@ window.onload = () => {
                 <button class="image-nav next" onclick="changeImage('${key}', 1)">❯</button>
             </div>
             <div class="product-info">
-                <!-- Product name with accent color -->
-                <h3 style="color: var(--accent-color);">${product.name}</h3>
-                
-                <!-- Prices with separate styles -->
-                <p class="price" style="color: #FF6F61;">السعر الأصلي: $${product.priceOriginal}</p>
-                <p class="price" style="color: #FFD700;">سعر الخصم: $${product.priceDiscount}</p>
-                <p class="price" style="color: #8B4896;">سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
-
-                <!-- Update stock quantity with larger font and custom color -->
-                <p class="stock" style="color: #FF5733; font-size: 1.0rem; font-weight: bold;">
+                <h3>${product.name}</h3>
+                <p class="price">السعر الأصلي: $${product.priceOriginal}</p>
+                <p class="price">سعر الخصم: $${product.priceDiscount}</p>
+                <p class="price">سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
+                  <!-- Update stock quantity with larger font and custom color -->
+                <p class="stock" style="color: #ff5733; font-size: 1.0rem; font-weight: bold;">
                     الكمية المتوفرة: ${product.quantity}
                 </p>
 
                 <div class="action-buttons">
-                    <!-- Like button with custom color -->
                     <button class="action-button" onclick="toggleLike('${key}')">
-                        <i class="fas fa-heart ${product.likes && product.likes[userId] ? 'text-danger' : ''}" style="color: #FF6F61;"></i>
-                        <span class="action-count" style="color: #FF6F61;">${countObjectProperties(product.likes)}</span>
+                        <i class="fas fa-heart ${product.likes && product.likes[userId] ? 'text-danger' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.likes)}</span>
                     </button>
-                    <!-- Favorite button with custom color -->
                     <button class="action-button" onclick="toggleFavorite('${key}')">
-                        <i class="fas fa-star ${product.favorites && product.favorites[userId] ? 'text-warning' : ''}" style="color: #FFD700;"></i>
-                        <span class="action-count" style="color: #FFD700;">${countObjectProperties(product.favorites)}</span>
+                        <i class="fas fa-star ${product.favorites && product.favorites[userId] ? 'text-warning' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.favorites)}</span>
                     </button>
-                    <!-- Save button with custom color -->
                     <button class="action-button" onclick="toggleSave('${key}')">
-                        <i class="fas fa-bookmark ${product.saved && product.saved[userId] ? 'text-primary' : ''}" style="color: #3498DB;"></i>
-                        <span class="action-count" style="color: #3498DB;">${countObjectProperties(product.saved)}</span>
+                        <i class="fas fa-bookmark ${product.saved && product.saved[userId] ? 'text-primary' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.saved)}</span>
                     </button>
-                    <!-- Cart button with custom color -->
                     <button class="action-button" onclick="toggleCart('${key}')">
-                        <i class="fas fa-shopping-cart ${product.cart && product.cart[userId] ? 'text-success' : ''}" style="color: #2ECC71;"></i>
-                        <span class="action-count" style="color: #2ECC71;">${countObjectProperties(product.cart)}</span>
+                        <i class="fas fa-shopping-cart ${product.cart && product.cart[userId] ? 'text-success' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.cart)}</span>
                     </button>
                 </div>
 
@@ -2144,6 +2146,7 @@ window.onload = () => {
         </div>
     `;
 }
+
 
 // دالة لإعادة التوجيه إلى صفحة المنتج
 function redirectToProductPage(fileName) {
