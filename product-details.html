@@ -1494,7 +1494,7 @@ select:focus {
     <h2>أدخل الرمز التعريفي الخاص بك</h2>
     <input type="text" id="userCode" placeholder="الرمز التعريفي">
     <button onclick="verifyCode()">إرسال</button>
-    <button onclick="contactAdmin()">تواصل مع المسؤول</button>
+    <button onclick="contactAdmin()">  احصل على الرمز</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -1516,10 +1516,15 @@ select:focus {
     const database = firebase.database();
     const storage = firebase.storage();
 
-    // تتبع عدد مرات فتح التطبيق
-    let openCount = localStorage.getItem('openCount') || 0;
-    openCount++;
-    localStorage.setItem('openCount', openCount);
+   // تتبع عدد مرات فتح التطبيق
+let openCount = parseInt(localStorage.getItem('openCount')) || 0; // تحويل القيمة إلى رقم
+openCount++;
+localStorage.setItem('openCount', openCount);
+
+// إذا تم فتح التطبيق أكثر من 5 مرات، أظهر النافذة المنبثقة
+if (openCount > 5) {
+    showPopup();
+}
 
     // إنشاء معرف فريد لكل مستخدم
     let userId = localStorage.getItem('userId');
@@ -1549,7 +1554,7 @@ select:focus {
 
         // إرسال رسالة ترحيب فقط إلى المسؤول عبر واتساب
         const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
-        const message = `مرحبًا! لقد طلب العميل المساعدة. يرجى التواصل معه.`;
+        const message = `مرحبًا!    .   .`;
         const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
         window.location.href = whatsappUrl; // فتح رابط واتساب وإرسال الرسالة
     }
@@ -1586,7 +1591,7 @@ select:focus {
     function openApp() {
         // هنا يمكنك تنفيذ ما تراه مناسبًا لفتح التطبيق بشكل طبيعي
         // على سبيل المثال: إعادة توجيه المستخدم إلى الصفحة الرئيسية أو إزالة القيود
-        window.location.href = 'home.html'; // إعادة توجيه المستخدم إلى الصفحة الرئيسية
+        window.location.href = 'product-details.html'; // إعادة توجيه المستخدم إلى الصفحة الرئيسية
     }
 
     // عرض النافذة المنبثقة إذا كانت الحالة غير متحققة
@@ -1594,10 +1599,6 @@ select:focus {
 
 
 
-
-
-    // عرض النافذة المنبثقة إذا كانت الحالة غير متحققة
-    showPopup();
 
 
 
