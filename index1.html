@@ -1232,6 +1232,105 @@ select:focus {
 
 
 
+#stories-container {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    position: relative;
+    scroll-snap-type: x mandatory; /* لتفعيل التمرير السلس بين القصص */
+    -ms-overflow-style: none; /* لإخفاء شريط التمرير في متصفح الإنترنت إكسبلورر */
+    scrollbar-width: none; /* لإخفاء شريط التمرير في فايرفوكس */
+}
+
+#stories-container::-webkit-scrollbar {
+    display: none; /* لإخفاء شريط التمرير في كروم وسفاري */
+}
+
+.story {
+    min-width: 70px; /* لجعل القصص تتمدد بشكل أفقي */
+    height: 70px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    scroll-snap-align: start; /* لضبط القصص بحيث تلتقط على الشاشة عند التمرير */
+}
+
+.story video {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* زر إضافة القصة بجانب القصص */
+.add-story-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.add-story-button img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#story-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+#story-modal.active {
+    display: flex;
+}
+
+#story-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none; /* لمنع التحكم بالفيديو */
+}
+
+#story-modal .navigation-left,
+#story-modal .navigation-right {
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    cursor: pointer;
+}
+
+#story-modal .navigation-left {
+    left: 0;
+}
+
+#story-modal .navigation-right {
+    right: 0;
+}
+
+
+
     </style>
 </head>
 <body>
@@ -1293,9 +1392,6 @@ select:focus {
   </div>
   
 
-    <div id="story-modal">
-        <span id=""إ;</span>
-    </div>
 
 
 
@@ -1451,6 +1547,26 @@ select:focus {
         <!-- سيتم إضافة الصور ديناميكيًا هنا -->
     </div>
     </div>
+<div id="stories-container">
+    <!-- سيُضاف الستوري هنا ديناميكيًا -->
+</div>
+
+<div id="story-modal">
+    <video id="story-video" autoplay muted></video>
+    <div class="navigation-left" onclick="goToPreviousStory()"></div>
+    <div class="navigation-right" onclick="goToNextStory()"></div>
+</div>
+</div>
+
+<div id="story-modal" class="modal">
+    <div class="navigation-left" onclick="goToPreviousStory()"></div> <!-- منطقة النقر للانتقال للقصة السابقة -->
+    <video id="story-video" autoplay muted></video>
+    <div class="navigation-right" onclick="goToNextStory()"></div> <!-- منطقة النقر للانتقال للقصة التالية -->
+</div>
+
+
+
+</div>
 
     <!-- المنتجات -->
     <div class="products" id="products">
@@ -1630,6 +1746,106 @@ function uploadAd() {
         }
     );
 }
+let stories = [];
+let currentStoryIndex = 0;
+
+// تحميل القصص من Firebase
+function loadStories() {
+    const container = document.getElementById('stories-container');
+    container.innerHTML = '';
+
+    firebase.database().ref('stories').once('value', (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            const storyData = childSnapshot.val();
+            const storyElement = document.createElement('div');
+            storyElement.classList.add('story');
+            storyElement.innerHTML = `<video src="${storyData.videoUrl}" muted loop></video>`;
+            container.insertBefore(storyElement, container.firstChild);
+
+            stories.push(storyData.videoUrl);
+            storyElement.addEventListener('click', () => openStoryModal(stories.length - 1));
+        });
+    });
+}
+
+// فتح القصة في نافذة منبثقة
+function openStoryModal(index) {
+    const storyModal = document.getElementById('story-modal');
+    const storyVideo = document.getElementById('story-video');
+    currentStoryIndex = index;
+    storyVideo.src = stories[currentStoryIndex];
+    storyModal.style.display = 'flex';
+
+    // إضافة حالة للعودة باستخدام زر الرجوع
+    history.pushState({ isStoryOpen: true }, '');
+}
+
+// إغلاق القصة عند النقر على زر العودة
+window.onpopstate = function(event) {
+    const storyModal = document.getElementById('story-modal');
+    const storyVideo = document.getElementById('story-video');
+    if (event.state && event.state.isStoryOpen) {
+        storyModal.style.display = 'none';
+        storyVideo.pause();
+    }
+};
+
+// الانتقال إلى القصة التالية
+function goToNextStory() {
+    if (currentStoryIndex < stories.length - 1) {
+        currentStoryIndex++;
+        openStoryModal(currentStoryIndex);
+    }
+}
+
+// العودة إلى القصة السابقة
+function goToPreviousStory() {
+    if (currentStoryIndex > 0) {
+        currentStoryIndex--;
+        openStoryModal(currentStoryIndex);
+    }
+}
+
+// إضافة قصة جديدة
+function openAddStoryModal() {
+    const storyInput = document.createElement('input');
+    storyInput.type = 'file';
+    storyInput.accept = 'video/*';
+    storyInput.addEventListener('change', uploadStory);
+    storyInput.click();
+}
+
+function uploadStory(event) {
+    const file = event.target.files[0];
+    const storageRef = firebase.storage().ref('stories/' + file.name);
+    storageRef.put(file).then(() => {
+        storageRef.getDownloadURL().then((url) => {
+            firebase.database().ref('stories').push({ videoUrl: url });
+            loadStories();
+        });
+    });
+}
+
+// تحميل القصص عند تحميل الصفحة
+window.onload = function() {
+    loadStories();
+};
+
+function openStoryModal(index) {
+    const storyModal = document.getElementById('story-modal');
+    const storyVideo = document.getElementById('story-video');
+    currentStoryIndex = index;
+    storyVideo.src = stories[currentStoryIndex];
+    storyVideo.muted = false; // إزالة كتم الصوت
+    storyVideo.autoplay = true; // التأكد من تشغيل الفيديو تلقائيًا
+    storyModal.style.display = 'flex';
+
+    // إضافة حالة للعودة باستخدام زر الرجوع
+    history.pushState({ isStoryOpen: true }, '');
+}
+
+
+
 
 // دالة لتحديث عدد المنتجات في السلة على الزر المنبثق الرئيسي
 function updateCartCountMain() {
@@ -2765,7 +2981,8 @@ fetchProducts();
 
             // Call functions on page load
             window.onload = function() {
-                initializeUserId(); // إعداد هوية المستخدم إذا لم تكن موجودة
+                 loadStories();
+                  initializeUserId(); // إعداد هوية المستخدم إذا لم تكن موجودة
                 displaySubscriberCount11(); // عرض عدد المشتركين
                 updateTotalViews(); // تحديث عدد المشاهدات الكلي
                 updateClock(); // تحديث الساعة
