@@ -1160,6 +1160,8 @@ select:focus {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  display: none;
+  
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
@@ -1551,11 +1553,11 @@ select:focus {
     <!-- سيُضاف الستوري هنا ديناميكيًا -->
 </div>
 
-<div id="story-modal">
-    <video id="story-video" autoplay muted></video>
-    <div class="navigation-left" onclick="goToPreviousStory()"></div>
-    <div class="navigation-right" onclick="goToNextStory()"></div>
-</div>
+<div id="stories-container">
+    <!-- القصص ستظهر هنا ديناميكيًا -->
+    <div class="add-story-button" onclick="openAddStoryModal()">
+        <img src="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2Fpngwing.com%20(1).png?alt=media&token=f4b65dff-469f-4466-9e2b-9fb5f1e54119" alt="Add Story">
+    </div>
 </div>
 
 <div id="story-modal" class="modal">
