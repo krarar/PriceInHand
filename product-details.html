@@ -1327,6 +1327,88 @@ select:focus {
     right: 0;
 }
 
+.interaction-icons {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    font-size: 24px;
+    color: white;
+}
+
+.interaction-icons i {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.interaction-icons i:hover {
+    transform: scale(1.2); /* تكبير الأيقونة عند التمرير */
+}
+
+#story-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    flex-direction: column;
+}
+
+video {
+    width: 100%;
+    height: 80vh;
+    object-fit: cover;
+}
+
+.bottom-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.icon-container {
+    display: flex;
+    gap: 20px;
+    color: white;
+    font-size: 24px;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.comment-input-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#comment-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 5px;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    background-color: white;
+    color: black;
+}
+
 
 
     </style>
@@ -1553,10 +1635,29 @@ select:focus {
     <video id="story-video" autoplay muted></video>
     <div class="navigation-left" onclick="goToPreviousStory()"></div>
     <div class="navigation-right" onclick="goToNextStory()"></div>
+
+    <!-- شريط الإيقونات وخانة التعليقات أسفل الفيديو -->
+    <div class="bottom-bar">
+        <div class="icon-container">
+            <div class="icon" onclick="likeStory()">
+                <i class="fas fa-heart"></i>
+                <span id="like-count">0</span> <!-- عداد الإعجابات -->
+            </div>
+            <div class="icon" onclick="toggleComments()">
+                <i class="fas fa-comment"></i>
+                <span>تعليق</span>
+            </div>
+            <div class="icon" onclick="shareStory()">
+                <i class="fas fa-paper-plane"></i>
+                <span>مشاركة</span>
+            </div>
+        </div>
+        <div class="comment-input-container">
+            <input type="text" id="comment-input" placeholder="أضف تعليقًا..." onkeydown="submitComment(event)">
+        </div>
+    </div>
 </div>
 
-</div>
-    </div>
 
     <!-- المنتجات -->
     <div class="products" id="products">
@@ -1719,7 +1820,6 @@ if (openCount > 5) {
     let isDarkMode = false;
     let currentProductId = null;
     let currentPrice = null;
-    
    let stories = [];
 let currentStoryIndex = 0;
 
@@ -1731,13 +1831,21 @@ function loadStories() {
     firebase.database().ref('stories').once('value', (snapshot) => {
         snapshot.forEach((childSnapshot) => {
             const storyData = childSnapshot.val();
-            const storyElement = document.createElement('div');
-            storyElement.classList.add('story');
-            storyElement.innerHTML = `<video src="${storyData.videoUrl}" muted loop></video>`;
-            container.insertBefore(storyElement, container.firstChild);
+            
+            // عرض القصة فقط إذا كانت تحتوي على محتوى
+            if (storyData.videoUrl) {
+                const storyElement = document.createElement('div');
+                storyElement.classList.add('story');
+                storyElement.innerHTML = `<video src="${storyData.videoUrl}" muted loop></video>`;
+                container.appendChild(storyElement);  // استخدام appendChild لعرض القصص بالترتيب
 
-            stories.push(storyData.videoUrl);
-            storyElement.addEventListener('click', () => openStoryModal(stories.length - 1));
+                // إضافة القصة إلى المصفوفة والاحتفاظ بالفهرس الصحيح
+                const storyIndex = stories.length;
+                stories.push(storyData.videoUrl);
+
+                // إضافة مستمع للنقر على القصة
+                storyElement.addEventListener('click', () => openStoryModal(storyIndex));
+            }
         });
     });
 }
@@ -1748,6 +1856,8 @@ function openStoryModal(index) {
     const storyVideo = document.getElementById('story-video');
     currentStoryIndex = index;
     storyVideo.src = stories[currentStoryIndex];
+    storyVideo.muted = false; // إزالة كتم الصوت
+    storyVideo.autoplay = true; // التأكد من تشغيل الفيديو تلقائيًا
     storyModal.style.display = 'flex';
 
     // إضافة حالة للعودة باستخدام زر الرجوع
@@ -1805,20 +1915,80 @@ window.onload = function() {
     loadStories();
 };
 
-function openStoryModal(index) {
-    const storyModal = document.getElementById('story-modal');
-    const storyVideo = document.getElementById('story-video');
-    currentStoryIndex = index;
-    storyVideo.src = stories[currentStoryIndex];
-    storyVideo.muted = false; // إزالة كتم الصوت
-    storyVideo.autoplay = true; // التأكد من تشغيل الفيديو تلقائيًا
-    storyModal.style.display = 'flex';
+let likesCount = 0;
 
-    // إضافة حالة للعودة باستخدام زر الرجوع
-    history.pushState({ isStoryOpen: true }, '');
+function likeStory() {
+    const storyId = stories[currentStoryIndex].id;
+    firebase.database().ref(`stories/${storyId}/likes`).transaction((currentLikes) => {
+        return (currentLikes || 0) + 1;
+    }).then((result) => {
+        likesCount = result.snapshot.val();
+        document.getElementById('like-count').textContent = likesCount;
+    });
+}
+
+function toggleComments() {
+    const commentsSection = document.getElementById('comments-section');
+    commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+    if (commentsSection.style.display === 'block') loadComments();
+}
+
+function loadComments() {
+    const storyId = stories[currentStoryIndex].id;
+    const commentsList = document.getElementById('comments-list');
+    commentsList.innerHTML = ''; // إزالة التعليقات القديمة
+
+    firebase.database().ref(`stories/${storyId}/comments`).once('value').then((snapshot) => {
+        snapshot.forEach((commentSnapshot) => {
+            const commentData = commentSnapshot.val();
+            const commentElement = document.createElement('div');
+            commentElement.textContent = commentData.text;
+            commentsList.appendChild(commentElement);
+        });
+    });
+}
+
+function submitComment(event) {
+    if (event.key === 'Enter') {
+        const commentText = document.getElementById('comment-input').value;
+        if (commentText) {
+            const storyId = stories[currentStoryIndex].id;
+            firebase.database().ref(`stories/${storyId}/comments`).push({
+                text: commentText,
+                timestamp: Date.now()
+            });
+            document.getElementById('comment-input').value = '';
+            loadComments();
+        }
+    }
 }
 
 
+function submitComment(event) {
+    if (event.key === 'Enter') {
+        const commentText = document.getElementById('comment-input').value;
+        if (commentText) {
+            const storyId = stories[currentStoryIndex].id;
+            firebase.database().ref(`stories/${storyId}/comments`).push({
+                text: commentText,
+                timestamp: Date.now()
+            });
+            document.getElementById('comment-input').value = '';
+            loadComments();
+        }
+    }
+}
+
+function shareStory() {
+    const storyId = stories[currentStoryIndex].id;
+    // مشاركة القصة عبر واجهات التواصل الاجتماعي
+    const shareUrl = `https://your-app-url.com/story/${storyId}`;
+    navigator.share({
+        title: 'قصة مميزة',
+        text: 'شاهد هذه القصة المثيرة!',
+        url: shareUrl
+    }).catch((error) => console.log('خطأ في المشاركة:', error));
+}
 
 
 
@@ -1958,7 +2128,6 @@ function initializeCarousel() {
 window.addEventListener('load', () => {
     fetchAds(); // استدعاء الدالة لجلب الإعلانات وعرضها فور تحميل الصفحة
 });
-    
 
 
 

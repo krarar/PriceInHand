@@ -1555,9 +1555,8 @@ select:focus {
 
 <div id="stories-container">
     <!-- القصص ستظهر هنا ديناميكيًا -->
-    <div class="add-story-button" onclick="openAddStoryModal()">
-        <img src="https://firebasestorage.googleapis.com/v0/b/messageemeapp.appspot.com/o/PriceInHand-main%2Fpngwing.com%20(1).png?alt=media&token=f4b65dff-469f-4466-9e2b-9fb5f1e54119" alt="Add Story">
-    </div>
+    
+       
 </div>
 
 <div id="story-modal" class="modal">
@@ -1759,13 +1758,21 @@ function loadStories() {
     firebase.database().ref('stories').once('value', (snapshot) => {
         snapshot.forEach((childSnapshot) => {
             const storyData = childSnapshot.val();
-            const storyElement = document.createElement('div');
-            storyElement.classList.add('story');
-            storyElement.innerHTML = `<video src="${storyData.videoUrl}" muted loop></video>`;
-            container.insertBefore(storyElement, container.firstChild);
+            
+            // عرض القصة فقط إذا كانت تحتوي على محتوى
+            if (storyData.videoUrl) {
+                const storyElement = document.createElement('div');
+                storyElement.classList.add('story');
+                storyElement.innerHTML = `<video src="${storyData.videoUrl}" muted loop></video>`;
+                container.appendChild(storyElement);  // استخدام appendChild لعرض القصص بالترتيب
 
-            stories.push(storyData.videoUrl);
-            storyElement.addEventListener('click', () => openStoryModal(stories.length - 1));
+                // إضافة القصة إلى المصفوفة والاحتفاظ بالفهرس الصحيح
+                const storyIndex = stories.length;
+                stories.push(storyData.videoUrl);
+
+                // إضافة مستمع للنقر على القصة
+                storyElement.addEventListener('click', () => openStoryModal(storyIndex));
+            }
         });
     });
 }
@@ -1776,6 +1783,8 @@ function openStoryModal(index) {
     const storyVideo = document.getElementById('story-video');
     currentStoryIndex = index;
     storyVideo.src = stories[currentStoryIndex];
+    storyVideo.muted = false; // إزالة كتم الصوت
+    storyVideo.autoplay = true; // التأكد من تشغيل الفيديو تلقائيًا
     storyModal.style.display = 'flex';
 
     // إضافة حالة للعودة باستخدام زر الرجوع
@@ -1833,21 +1842,80 @@ window.onload = function() {
     loadStories();
 };
 
-function openStoryModal(index) {
-    const storyModal = document.getElementById('story-modal');
-    const storyVideo = document.getElementById('story-video');
-    currentStoryIndex = index;
-    storyVideo.src = stories[currentStoryIndex];
-    storyVideo.muted = false; // إزالة كتم الصوت
-    storyVideo.autoplay = true; // التأكد من تشغيل الفيديو تلقائيًا
-    storyModal.style.display = 'flex';
+let likesCount = 0;
 
-    // إضافة حالة للعودة باستخدام زر الرجوع
-    history.pushState({ isStoryOpen: true }, '');
+function likeStory() {
+    const storyId = stories[currentStoryIndex].id;
+    firebase.database().ref(`stories/${storyId}/likes`).transaction((currentLikes) => {
+        return (currentLikes || 0) + 1;
+    }).then((result) => {
+        likesCount = result.snapshot.val();
+        document.getElementById('like-count').textContent = likesCount;
+    });
+}
+
+function toggleComments() {
+    const commentsSection = document.getElementById('comments-section');
+    commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+    if (commentsSection.style.display === 'block') loadComments();
+}
+
+function loadComments() {
+    const storyId = stories[currentStoryIndex].id;
+    const commentsList = document.getElementById('comments-list');
+    commentsList.innerHTML = ''; // إزالة التعليقات القديمة
+
+    firebase.database().ref(`stories/${storyId}/comments`).once('value').then((snapshot) => {
+        snapshot.forEach((commentSnapshot) => {
+            const commentData = commentSnapshot.val();
+            const commentElement = document.createElement('div');
+            commentElement.textContent = commentData.text;
+            commentsList.appendChild(commentElement);
+        });
+    });
+}
+
+function submitComment(event) {
+    if (event.key === 'Enter') {
+        const commentText = document.getElementById('comment-input').value;
+        if (commentText) {
+            const storyId = stories[currentStoryIndex].id;
+            firebase.database().ref(`stories/${storyId}/comments`).push({
+                text: commentText,
+                timestamp: Date.now()
+            });
+            document.getElementById('comment-input').value = '';
+            loadComments();
+        }
+    }
 }
 
 
+function submitComment(event) {
+    if (event.key === 'Enter') {
+        const commentText = document.getElementById('comment-input').value;
+        if (commentText) {
+            const storyId = stories[currentStoryIndex].id;
+            firebase.database().ref(`stories/${storyId}/comments`).push({
+                text: commentText,
+                timestamp: Date.now()
+            });
+            document.getElementById('comment-input').value = '';
+            loadComments();
+        }
+    }
+}
 
+function shareStory() {
+    const storyId = stories[currentStoryIndex].id;
+    // مشاركة القصة عبر واجهات التواصل الاجتماعي
+    const shareUrl = `https://your-app-url.com/story/${storyId}`;
+    navigator.share({
+        title: 'قصة مميزة',
+        text: 'شاهد هذه القصة المثيرة!',
+        url: shareUrl
+    }).catch((error) => console.log('خطأ في المشاركة:', error));
+}
 
 // دالة لتحديث عدد المنتجات في السلة على الزر المنبثق الرئيسي
 function updateCartCountMain() {
