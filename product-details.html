@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!-- للغة العربية -->
 
 <head>
     <meta charset="UTF-8">
@@ -1409,6 +1409,95 @@ video {
     color: black;
 }
 
+/* Center the button inside the video container */
+.center-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s ease;
+    z-index: 9999; /* Make sure it stays on top */
+}
+
+/* Hover effect for the button */
+.center-button:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.center-button i {
+    font-size: 20px;
+}
+
+/* Style for the Add Story button */
+.add-story-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Hover effect for the Add Story button */
+.add-story-button:hover {
+    background-color: #0056b3;
+}
+
+/* Style for the form that appears for adding a new story */
+.story-form {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 8px;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.story-form h3 {
+    margin-bottom: 20px;
+}
+
+.story-form input {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+.story-form button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.story-form button:hover {
+    background-color: #218838;
+}
 
 
     </style>
@@ -1626,37 +1715,53 @@ video {
     <!-- الشريط الإعلاني -->
     <div class="carousel" id="adCarousel">
         <!-- سيتم إضافة الصور ديناميكيًا هنا -->
-    </div>
-    <div id="stories-container">
+    
+    <!-- سيُضاف الستوري هنا ديناميكيًا -->
+</div>
+<div id="stories-container">
     <!-- سيُضاف الستوري هنا ديناميكيًا -->
 </div>
 
-<div id="story-modal">
-    <video id="story-video" autoplay muted></video>
-    <div class="navigation-left" onclick="goToPreviousStory()"></div>
-    <div class="navigation-right" onclick="goToNextStory()"></div>
+<!-- Button to show the form for adding a new story -->
 
-    <!-- شريط الإيقونات وخانة التعليقات أسفل الفيديو -->
-    <div class="bottom-bar">
-        <div class="icon-container">
-            <div class="icon" onclick="likeStory()">
-                <i class="fas fa-heart"></i>
-                <span id="like-count">0</span> <!-- عداد الإعجابات -->
-            </div>
-            <div class="icon" onclick="toggleComments()">
-                <i class="fas fa-comment"></i>
-                <span>تعليق</span>
-            </div>
-            <div class="icon" onclick="shareStory()">
-                <i class="fas fa-paper-plane"></i>
-                <span>مشاركة</span>
-            </div>
-        </div>
-        <div class="comment-input-container">
-            <input type="text" id="comment-input" placeholder="أضف تعليقًا..." onkeydown="submitComment(event)">
-        </div>
+<!-- Form for adding a new story (hidden by default) -->
+<div id="add-story-form" class="story-form" style="display: none;">
+    <h3>Add New Story</h3>
+    
+    <!-- Input for uploading the video -->
+    <input type="file" id="story-video-input" accept="video/*" placeholder="Upload Story Video">
+    
+    <!-- Input for entering the target page URL -->
+    <input type="text" id="target-page-url" placeholder="Enter Target Page URL">
+    
+    <!-- Input for entering the additional text -->
+    <input type="text" id="story-text" placeholder="Enter Story Text">
+    
+    <!-- Button to submit and save the story -->
+    <button onclick="saveStory()">Save Story</button>
+</div>
+
+
+<!-- Story Modal -->
+<div id="story-modal" style="display:none;">
+    <video id="story-video" autoplay controls></video>
+
+    <!-- Clickable areas for story navigation -->
+    <div id="nav-left" class="nav-area" onclick="goToPreviousStory()"></div>
+    <div id="nav-right" class="nav-area" onclick="goToNextStory()"></div>
+    <div id="story-controls" class="story-controls">
+    <button id="prev-button" class="nav-button">السابق</button>
+    <button id="next-button" class="nav-button">التالي</button>
+</div>
+<div id="story-counter" class="story-counter"></div>
+
+    <!-- Center button for redirecting to the target page -->
+    <div id="center-button" class="center-button" onclick="redirectToTargetPage()">
+        <i class="fas fa-link"></i>
+        <span>Go to Page</span>
     </div>
 </div>
+
 
 
     <!-- المنتجات -->
@@ -1820,8 +1925,90 @@ if (openCount > 5) {
     let isDarkMode = false;
     let currentProductId = null;
     let currentPrice = null;
-   let stories = [];
+ // المتغيرات العالمية
+let stories = [];
 let currentStoryIndex = 0;
+let isRTL = false; // متغير للتحقق من اتجاه اللغة
+
+// تهيئة التطبيق عند تحميل الصفحة
+window.onload = function() {
+    // التحقق من اتجاه اللغة
+    checkDirection();
+    loadStories();
+    setupEventListeners();
+};
+
+// التحقق من اتجاه اللغة
+function checkDirection() {
+    // التحقق من اتجاه الصفحة
+    const htmlDir = document.documentElement.dir;
+    const htmlLang = document.documentElement.lang;
+    
+    // التحقق من اللغة والاتجاه
+    isRTL = htmlDir === 'rtl' || 
+            htmlLang === 'ar' || 
+            htmlLang === 'he' || 
+            htmlLang === 'fa';
+    
+    // تطبيق الاتجاه المناسب على الحاوية
+    const container = document.getElementById('stories-container');
+    if (container) {
+        container.dir = isRTL ? 'rtl' : 'ltr';
+        container.classList.toggle('rtl-layout', isRTL);
+    }
+}
+
+// إعداد مستمعي الأحداث
+function setupEventListeners() {
+    const storyModal = document.getElementById('story-modal');
+    
+    // مستمع النقر للتنقل بين القصص
+    document.addEventListener('click', function(event) {
+        if (storyModal.style.display === 'flex') {
+            const screenWidth = window.innerWidth;
+            const clickPosition = event.clientX;
+            const thirdWidth = screenWidth / 3;
+            
+            // تعديل منطق التنقل بناءً على اتجاه اللغة
+            if (isRTL) {
+                // للغة العربية والـ RTL
+                if (clickPosition > (screenWidth - thirdWidth)) {
+                    goToPreviousStory();
+                } else if (clickPosition < thirdWidth) {
+                    goToNextStory();
+                }
+            } else {
+                // للغة الإنجليزية والـ LTR
+                if (clickPosition < thirdWidth) {
+                    goToPreviousStory();
+                } else if (clickPosition > (screenWidth - thirdWidth)) {
+                    goToNextStory();
+                }
+            }
+        }
+    });
+
+    // إضافة مستمعي لوحة المفاتيح للتنقل
+    document.addEventListener('keydown', function(event) {
+        if (storyModal.style.display === 'flex') {
+            if (isRTL) {
+                // للغة العربية والـ RTL
+                if (event.key === 'ArrowLeft') {
+                    goToNextStory();
+                } else if (event.key === 'ArrowRight') {
+                    goToPreviousStory();
+                }
+            } else {
+                // للغة الإنجليزية والـ LTR
+                if (event.key === 'ArrowRight') {
+                    goToNextStory();
+                } else if (event.key === 'ArrowLeft') {
+                    goToPreviousStory();
+                }
+            }
+        }
+    });
+}
 
 // تحميل القصص من Firebase
 function loadStories() {
@@ -1829,52 +2016,184 @@ function loadStories() {
     container.innerHTML = '';
 
     firebase.database().ref('stories').once('value', (snapshot) => {
+        stories = [];
+        
         snapshot.forEach((childSnapshot) => {
             const storyData = childSnapshot.val();
+            storyData.id = childSnapshot.key;
             
-            // عرض القصة فقط إذا كانت تحتوي على محتوى
             if (storyData.videoUrl) {
-                const storyElement = document.createElement('div');
-                storyElement.classList.add('story');
-                storyElement.innerHTML = `<video src="${storyData.videoUrl}" muted loop></video>`;
-                container.appendChild(storyElement);  // استخدام appendChild لعرض القصص بالترتيب
+                const storyElement = createStoryElement(storyData, stories.length);
+                container.appendChild(storyElement);
+                stories.push(storyData);
+            }
+        });
 
-                // إضافة القصة إلى المصفوفة والاحتفاظ بالفهرس الصحيح
-                const storyIndex = stories.length;
-                stories.push(storyData.videoUrl);
+        // تطبيق الترتيب المناسب للقصص بناءً على اتجاه اللغة
+        if (isRTL) {
+            arrangeStoriesRTL(container);
+        }
+    });
+}
 
-                // إضافة مستمع للنقر على القصة
-                storyElement.addEventListener('click', () => openStoryModal(storyIndex));
+// ترتيب القصص للغة العربية
+function arrangeStoriesRTL(container) {
+    // تحويل ترتيب العناصر للـ RTL
+    const storyElements = Array.from(container.children);
+    container.innerHTML = '';
+    storyElements.reverse().forEach(element => {
+        container.appendChild(element);
+    });
+}
+
+// إنشاء عنصر القصة
+function createStoryElement(storyData, index) {
+    const storyElement = document.createElement('div');
+    storyElement.classList.add('story');
+    if (isRTL) {
+        storyElement.classList.add('story-rtl');
+    }
+    
+    storyElement.innerHTML = `
+        <video src="${storyData.videoUrl}" muted loop></video>
+        ${storyData.storyText ? `<div class="story-text ${isRTL ? 'rtl-text' : ''}">${storyData.storyText}</div>` : ''}
+    `;
+    
+    storyElement.addEventListener('click', (e) => {
+        e.stopPropagation(); // منع انتشار الحدث
+        openStoryModal(index);
+    });
+    
+    return storyElement;
+}
+
+// فتح نافذة القصة المنبثقة
+function openStoryModal(index) {
+    const storyModal = document.getElementById('story-modal');
+    const storyVideo = document.getElementById('story-video');
+    const storyControls = document.getElementById('story-controls');
+    
+    currentStoryIndex = index;
+    const currentStory = stories[currentStoryIndex];
+    
+    // تعيين الاتجاه المناسب للنافذة المنبثقة
+    storyModal.dir = isRTL ? 'rtl' : 'ltr';
+    storyModal.classList.toggle('rtl-modal', isRTL);
+    
+    storyVideo.src = currentStory.videoUrl;
+    storyVideo.muted = false;
+    storyVideo.autoplay = true;
+    storyModal.style.display = 'flex';
+    
+    // تحديث أزرار التنقل
+    updateNavigationButtons();
+    
+    // تحديث عداد القصص
+    updateStoryCounter();
+    
+    history.pushState({ isStoryOpen: true }, '');
+}
+
+// تحديث أزرار التنقل
+function updateNavigationButtons() {
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+    
+    if (isRTL) {
+        // تبديل مواقع الأزرار للغة العربية
+        prevButton.style.left = 'auto';
+        prevButton.style.right = '10px';
+        nextButton.style.right = 'auto';
+        nextButton.style.left = '10px';
+    } else {
+        // المواقع الافتراضية للغة الإنجليزية
+        prevButton.style.left = '10px';
+        prevButton.style.right = 'auto';
+        nextButton.style.right = '10px';
+        nextButton.style.left = 'auto';
+    }
+    
+    // تحديث حالة الأزرار
+    prevButton.disabled = currentStoryIndex === 0;
+    nextButton.disabled = currentStoryIndex === stories.length - 1;
+}
+
+// تحديث عداد القصص
+function updateStoryCounter() {
+    const counter = document.getElementById('story-counter');
+    if (counter) {
+        const current = currentStoryIndex + 1;
+        const total = stories.length;
+        counter.textContent = isRTL ? 
+            `${total} / ${current}` : 
+            `${current} / ${total}`;
+    }
+}
+
+// تهيئة التطبيق عند تحميل الصفحة
+window.onload = function() {
+    loadStories();
+};
+
+// تحميل القصص من Firebase
+function loadStories() {
+    const container = document.getElementById('stories-container');
+    container.innerHTML = '';
+
+    firebase.database().ref('stories').once('value', (snapshot) => {
+        stories = []; // إعادة تعيين المصفوفة قبل تحميل القصص الجديدة
+        
+        snapshot.forEach((childSnapshot) => {
+            const storyData = childSnapshot.val();
+            storyData.id = childSnapshot.key; // حفظ معرف القصة
+            
+            if (storyData.videoUrl) {
+                const storyElement = createStoryElement(storyData, stories.length);
+                container.appendChild(storyElement);
+                stories.push(storyData);
             }
         });
     });
 }
 
-// فتح القصة في نافذة منبثقة
+// إنشاء عنصر القصة
+function createStoryElement(storyData, index) {
+    const storyElement = document.createElement('div');
+    storyElement.classList.add('story');
+    storyElement.innerHTML = `<video src="${storyData.videoUrl}" muted loop></video>`;
+    storyElement.addEventListener('click', () => openStoryModal(index));
+    return storyElement;
+}
+
+// إدارة القصة المنبثقة
 function openStoryModal(index) {
     const storyModal = document.getElementById('story-modal');
     const storyVideo = document.getElementById('story-video');
+    const centerButton = document.getElementById('center-button');
+    
     currentStoryIndex = index;
-    storyVideo.src = stories[currentStoryIndex];
-    storyVideo.muted = false; // إزالة كتم الصوت
-    storyVideo.autoplay = true; // التأكد من تشغيل الفيديو تلقائيًا
+    const currentStory = stories[currentStoryIndex];
+    
+    storyVideo.src = currentStory.videoUrl;
+    storyVideo.muted = false;
+    storyVideo.autoplay = true;
     storyModal.style.display = 'flex';
-
-    // إضافة حالة للعودة باستخدام زر الرجوع
+    
+    // تحديث زر التوجيه
+    if (currentStory.targetPageUrl) {
+        centerButton.onclick = () => window.open(currentStory.targetPageUrl, '_blank');
+        centerButton.style.display = 'block';
+    } else {
+        centerButton.style.display = 'none';
+    }
+    
+    // تحديث عداد الإعجابات
+    updateLikesCount(currentStory.id);
+    
     history.pushState({ isStoryOpen: true }, '');
 }
 
-// إغلاق القصة عند النقر على زر العودة
-window.onpopstate = function(event) {
-    const storyModal = document.getElementById('story-modal');
-    const storyVideo = document.getElementById('story-video');
-    if (event.state && event.state.isStoryOpen) {
-        storyModal.style.display = 'none';
-        storyVideo.pause();
-    }
-};
-
-// الانتقال إلى القصة التالية
+// التنقل بين القصص
 function goToNextStory() {
     if (currentStoryIndex < stories.length - 1) {
         currentStoryIndex++;
@@ -1882,7 +2201,6 @@ function goToNextStory() {
     }
 }
 
-// العودة إلى القصة السابقة
 function goToPreviousStory() {
     if (currentStoryIndex > 0) {
         currentStoryIndex--;
@@ -1891,107 +2209,165 @@ function goToPreviousStory() {
 }
 
 // إضافة قصة جديدة
-function openAddStoryModal() {
-    const storyInput = document.createElement('input');
-    storyInput.type = 'file';
-    storyInput.accept = 'video/*';
-    storyInput.addEventListener('change', uploadStory);
-    storyInput.click();
+function toggleStoryForm() {
+    const form = document.getElementById('add-story-form');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
 
-function uploadStory(event) {
-    const file = event.target.files[0];
-    const storageRef = firebase.storage().ref('stories/' + file.name);
-    storageRef.put(file).then(() => {
-        storageRef.getDownloadURL().then((url) => {
-            firebase.database().ref('stories').push({ videoUrl: url });
+function saveStory() {
+    const videoInput = document.getElementById('story-video-input');
+    const targetPageUrl = document.getElementById('target-page-url').value;
+    const storyText = document.getElementById('story-text').value;
+
+    if (!validateStoryInput(videoInput, targetPageUrl, storyText)) return;
+
+    uploadStoryToFirebase(videoInput.files[0], targetPageUrl, storyText);
+}
+
+function validateStoryInput(videoInput, targetPageUrl, storyText) {
+    if (!videoInput.files.length || !targetPageUrl || !storyText) {
+        alert('الرجاء ملء جميع الحقول!');
+        return false;
+    }
+    return true;
+}
+
+function uploadStoryToFirebase(videoFile, targetPageUrl, storyText) {
+    const storageRef = firebase.storage().ref('stories/' + videoFile.name);
+    
+    storageRef.put(videoFile)
+        .then(() => storageRef.getDownloadURL())
+        .then(videoUrl => {
+            return firebase.database().ref('stories').push({
+                videoUrl,
+                targetPageUrl,
+                storyText,
+                timestamp: Date.now(),
+                likes: 0,
+                comments: {}
+            });
+        })
+        .then(() => {
+            alert('تم حفظ القصة بنجاح!');
+            toggleStoryForm();
             loadStories();
+        })
+        .catch(error => {
+            console.error('خطأ في رفع الفيديو:', error);
+            alert('حدث خطأ أثناء رفع الفيديو.');
         });
-    });
 }
 
-// تحميل القصص عند تحميل الصفحة
-window.onload = function() {
-    loadStories();
-};
-
-let likesCount = 0;
+// إدارة الإعجابات والتعليقات
+function updateLikesCount(storyId) {
+    firebase.database().ref(`stories/${storyId}/likes`).once('value')
+        .then(snapshot => {
+            const likesCount = snapshot.val() || 0;
+            document.getElementById('like-count').textContent = likesCount;
+        });
+}
 
 function likeStory() {
     const storyId = stories[currentStoryIndex].id;
-    firebase.database().ref(`stories/${storyId}/likes`).transaction((currentLikes) => {
-        return (currentLikes || 0) + 1;
-    }).then((result) => {
-        likesCount = result.snapshot.val();
-        document.getElementById('like-count').textContent = likesCount;
-    });
+    const likesRef = firebase.database().ref(`stories/${storyId}/likes`);
+    
+    likesRef.transaction(currentLikes => (currentLikes || 0) + 1)
+        .then(result => {
+            document.getElementById('like-count').textContent = result.snapshot.val();
+        });
 }
 
 function toggleComments() {
     const commentsSection = document.getElementById('comments-section');
     commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
-    if (commentsSection.style.display === 'block') loadComments();
+    
+    if (commentsSection.style.display === 'block') {
+        loadComments();
+    }
 }
 
 function loadComments() {
     const storyId = stories[currentStoryIndex].id;
     const commentsList = document.getElementById('comments-list');
-    commentsList.innerHTML = ''; // إزالة التعليقات القديمة
+    commentsList.innerHTML = '';
 
-    firebase.database().ref(`stories/${storyId}/comments`).once('value').then((snapshot) => {
-        snapshot.forEach((commentSnapshot) => {
-            const commentData = commentSnapshot.val();
-            const commentElement = document.createElement('div');
-            commentElement.textContent = commentData.text;
-            commentsList.appendChild(commentElement);
+    firebase.database().ref(`stories/${storyId}/comments`).once('value')
+        .then(snapshot => {
+            snapshot.forEach(commentSnapshot => {
+                const comment = commentSnapshot.val();
+                const commentElement = createCommentElement(comment);
+                commentsList.appendChild(commentElement);
+            });
         });
-    });
+}
+
+function createCommentElement(comment) {
+    const commentElement = document.createElement('div');
+    commentElement.classList.add('comment');
+    commentElement.textContent = comment.text;
+    return commentElement;
 }
 
 function submitComment(event) {
     if (event.key === 'Enter') {
-        const commentText = document.getElementById('comment-input').value;
+        const commentInput = document.getElementById('comment-input');
+        const commentText = commentInput.value.trim();
+        
         if (commentText) {
             const storyId = stories[currentStoryIndex].id;
             firebase.database().ref(`stories/${storyId}/comments`).push({
                 text: commentText,
                 timestamp: Date.now()
+            }).then(() => {
+                commentInput.value = '';
+                loadComments();
             });
-            document.getElementById('comment-input').value = '';
-            loadComments();
         }
     }
 }
 
-
-function submitComment(event) {
-    if (event.key === 'Enter') {
-        const commentText = document.getElementById('comment-input').value;
-        if (commentText) {
-            const storyId = stories[currentStoryIndex].id;
-            firebase.database().ref(`stories/${storyId}/comments`).push({
-                text: commentText,
-                timestamp: Date.now()
-            });
-            document.getElementById('comment-input').value = '';
-            loadComments();
-        }
-    }
-}
-
+// مشاركة القصة
 function shareStory() {
-    const storyId = stories[currentStoryIndex].id;
-    // مشاركة القصة عبر واجهات التواصل الاجتماعي
-    const shareUrl = `https://your-app-url.com/story/${storyId}`;
-    navigator.share({
-        title: 'قصة مميزة',
-        text: 'شاهد هذه القصة المثيرة!',
-        url: shareUrl
-    }).catch((error) => console.log('خطأ في المشاركة:', error));
+    const currentStory = stories[currentStoryIndex];
+    const shareUrl = `https://your-app-url.com/story/${currentStory.id}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'قصة مميزة',
+            text: currentStory.storyText || 'شاهد هذه القصة المثيرة!',
+            url: shareUrl
+        }).catch(error => console.log('خطأ في المشاركة:', error));
+    } else {
+        // احتياطي للمتصفحات التي لا تدعم واجهة المشاركة
+        prompt('انسخ الرابط للمشاركة:', shareUrl);
+    }
 }
 
+// معالجة زر الرجوع في المتصفح
+window.onpopstate = function(event) {
+    if (event.state && event.state.isStoryOpen) {
+        const storyModal = document.getElementById('story-modal');
+        const storyVideo = document.getElementById('story-video');
+        storyModal.style.display = 'none';
+        storyVideo.pause();
+    }
+};
 
-
+// إضافة مستمع للنقر على الشاشة للتنقل بين القصص
+document.addEventListener('click', function(event) {
+    const storyModal = document.getElementById('story-modal');
+    if (storyModal.style.display === 'flex') {
+        const screenWidth = window.innerWidth;
+        const clickPosition = event.clientX;
+        
+        if (clickPosition < screenWidth / 3) {
+            goToPreviousStory();
+        } else if (clickPosition > (screenWidth * 2/3)) {
+            goToNextStory();
+        }
+        // المنطقة الوسطى مخصصة للتفاعل مع القصة
+    }
+});
 /// دالة لفتح وإغلاق القائمة المنبثقة عند النقر على الزر
 let firstClick = true; // متغير لتتبع النقرات
 
