@@ -1724,6 +1724,7 @@ video {
 
 <!-- Button to show the form for adding a new story -->
 
+
 <!-- Form for adding a new story (hidden by default) -->
 <div id="add-story-form" class="story-form" style="display: none;">
     <h3>Add New Story</h3>
@@ -1749,12 +1750,15 @@ video {
     <!-- Clickable areas for story navigation -->
     <div id="nav-left" class="nav-area" onclick="goToPreviousStory()"></div>
     <div id="nav-right" class="nav-area" onclick="goToNextStory()"></div>
- 
+    <div id="story-controls" class="story-controls">
+    
+</div>
+<div id="story-counter" class="story-counter"></div>
 
     <!-- Center button for redirecting to the target page -->
     <div id="center-button" class="center-button" onclick="redirectToTargetPage()">
-        <i class="fas fa-link"></i>
-        <span>Go to Page</span>
+        <i class="fab fa-whatsapp"></i>
+        <span>الاستعلام عن المنتج</span>
     </div>
 </div>
 
@@ -1953,6 +1957,7 @@ function checkDirection() {
         container.classList.toggle('rtl-layout', isRTL);
     }
 }
+
 
 // إعداد مستمعي الأحداث
 function setupEventListeners() {
@@ -2175,9 +2180,15 @@ function openStoryModal(index) {
     storyVideo.autoplay = true;
     storyModal.style.display = 'flex';
     
-    // تحديث زر التوجيه
+    // تحديث زر التوجيه لإرسال رابط المنتج إلى واتساب
+    const whatsappNumber = '9647813798636';  // رقم الواتساب الذي سيتم إرسال الرابط إليه
     if (currentStory.targetPageUrl) {
-        centerButton.onclick = () => window.open(currentStory.targetPageUrl, '_blank');
+        const productLink = currentStory.targetPageUrl;  // رابط المنتج الذي سيتم إرساله
+        const message = `أرغب في الاستعلام عن هذا المنتج: ${productLink}`;  // الرسالة التي ستُرسل
+        centerButton.onclick = () => {
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.location.href = whatsappUrl;
+        };
         centerButton.style.display = 'block';
     } else {
         centerButton.style.display = 'none';
@@ -2188,6 +2199,7 @@ function openStoryModal(index) {
     
     history.pushState({ isStoryOpen: true }, '');
 }
+
 
 // التنقل بين القصص
 function goToNextStory() {

@@ -1858,12 +1858,10 @@ video {
 
     <!-- Center button for redirecting to the target page -->
     <div id="center-button" class="center-button" onclick="redirectToTargetPage()">
-        <i class="fas fa-link"></i>
-        <span>Go to Page</span>
+        <i class="fab fa-whatsapp"></i>
+        <span>الاستعلام عن المنتج</span>
     </div>
 </div>
-
-
 
 
 </div>
@@ -2046,6 +2044,7 @@ function uploadAd() {
         }
     );
 }
+// المتغيرات العالمية
 let stories = [];
 let currentStoryIndex = 0;
 let isRTL = false; // متغير للتحقق من اتجاه اللغة
@@ -2077,6 +2076,7 @@ function checkDirection() {
         container.classList.toggle('rtl-layout', isRTL);
     }
 }
+
 
 // إعداد مستمعي الأحداث
 function setupEventListeners() {
@@ -2299,9 +2299,15 @@ function openStoryModal(index) {
     storyVideo.autoplay = true;
     storyModal.style.display = 'flex';
     
-    // تحديث زر التوجيه
+    // تحديث زر التوجيه لإرسال رابط المنتج إلى واتساب
+    const whatsappNumber = '9647813798636';  // رقم الواتساب الذي سيتم إرسال الرابط إليه
     if (currentStory.targetPageUrl) {
-        centerButton.onclick = () => window.open(currentStory.targetPageUrl, '_blank');
+        const productLink = currentStory.targetPageUrl;  // رابط المنتج الذي سيتم إرساله
+        const message = `أرغب في الاستعلام عن هذا المنتج: ${productLink}`;  // الرسالة التي ستُرسل
+        centerButton.onclick = () => {
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.location.href = whatsappUrl;
+        };
         centerButton.style.display = 'block';
     } else {
         centerButton.style.display = 'none';
@@ -2312,6 +2318,7 @@ function openStoryModal(index) {
     
     history.pushState({ isStoryOpen: true }, '');
 }
+
 
 // التنقل بين القصص
 function goToNextStory() {
