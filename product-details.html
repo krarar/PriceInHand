@@ -1499,6 +1499,23 @@ video {
     background-color: #218838;
 }
 
+.product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1);
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
+.product-image.active {
+    opacity: 1;
+    transform: scale(1.05); /* تكبير الصورة قليلاً عند الانتقال */
+}
+
 
     </style>
 </head>
@@ -2900,80 +2917,30 @@ window.onload = () => {
         }
 
         // Update the fetchProducts function to also update the cart count
-       function createProductCard(key, product) {
-    const images = product.images || [product.image];
-    const imagesHtml = images.map((img, index) => `
-        <img src="${img}" alt="${product.name}" class="product-image" style="opacity: ${index === 0 ? 1 : 0};" onclick="redirectToProductPage('${product.fileName}')">
-    `).join('');
-
-    // Check if the product is out of stock
-    const isOutOfStock = product.quantity <= 0;
-
-    return `
-        <div class="product-card" data-product-id="${key}">
-            <div class="product-images">
-                ${imagesHtml}
-                <button class="image-nav prev" onclick="changeImage('${key}', -1)">❮</button>
-                <button class="image-nav next" onclick="changeImage('${key}', 1)">❯</button>
-            </div>
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <p class="price">السعر الأصلي: $${product.priceOriginal}</p>
-                <p class="price">سعر الخصم: $${product.priceDiscount}</p>
-                <p class="price">سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
-                  <!-- Update stock quantity with larger font and custom color -->
-                <p class="stock" style="color: #ff5733; font-size: 1.0rem; font-weight: bold;">
-                    الكمية المتوفرة: ${product.quantity}
-                </p>
-
-                <div class="action-buttons">
-                    <button class="action-button" onclick="toggleLike('${key}')">
-                        <i class="fas fa-heart ${product.likes && product.likes[userId] ? 'text-danger' : ''}"></i>
-                        <span class="action-count">${countObjectProperties(product.likes)}</span>
-                    </button>
-                    <button class="action-button" onclick="toggleFavorite('${key}')">
-                        <i class="fas fa-star ${product.favorites && product.favorites[userId] ? 'text-warning' : ''}"></i>
-                        <span class="action-count">${countObjectProperties(product.favorites)}</span>
-                    </button>
-                    <button class="action-button" onclick="toggleSave('${key}')">
-                        <i class="fas fa-bookmark ${product.saved && product.saved[userId] ? 'text-primary' : ''}"></i>
-                        <span class="action-count">${countObjectProperties(product.saved)}</span>
-                    </button>
-                    <button class="action-button" onclick="toggleCart('${key}')">
-                        <i class="fas fa-shopping-cart ${product.cart && product.cart[userId] ? 'text-success' : ''}"></i>
-                        <span class="action-count">${countObjectProperties(product.cart)}</span>
-                    </button>
-                </div>
-
-                <!-- Show "Buy" button if the product is in stock, otherwise hide it -->
-                <button class="buy-button" ${isOutOfStock ? 'style="display:none;"' : ''} onclick="showPricePopup('${key}')">
-                    شراء الآن
-                </button>
-            </div>
-        </div>
-    `;
-}
+      
 function createProductCard(key, product) {
     const images = product.images || [product.image];
     const whatsappNumber = '9647813798636';  // رقم الواتساب الذي سيتم إرسال الرابط إليه
 
+    // بناء HTML للصور
     const imagesHtml = images.map((img, index) => `
-        <img src="${img}" alt="${product.name}" class="product-image" style="opacity: ${index === 0 ? 1 : 0};" 
+        <img src="${img}" alt="${product.name}" class="product-image ${index === 0 ? 'active' : ''}" id="image-${key}-${index}" 
             onclick="sendToWhatsApp('${product.name}', '${product.priceOriginal}', '${product.priceDiscount}', '${product.priceSuperDiscount}', '${img}')">
     `).join('');
 
-    // Check if the product is out of stock
+    // التحقق مما إذا كان المنتج غير متوفر
     const isOutOfStock = product.quantity <= 0;
 
-    return `
+    // بناء بطاقة المنتج
+    const productCardHtml = `
         <div class="product-card" data-product-id="${key}">
-            <div class="product-images">
+            <div class="product-images" id="product-images-${key}">
                 ${imagesHtml}
                 <button class="image-nav prev" onclick="changeImage('${key}', -1)">❮</button>
                 <button class="image-nav next" onclick="changeImage('${key}', 1)">❯</button>
             </div>
             <div class="product-info">
-                <h3>${product.name}</h3>
+                <h3 style="color: white;">${product.name}</h3>
                 <p class="price">السعر الأصلي: $${product.priceOriginal}</p>
                 <p class="price">سعر الخصم: $${product.priceDiscount}</p>
                 <p class="price">سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
@@ -3006,7 +2973,34 @@ function createProductCard(key, product) {
             </div>
         </div>
     `;
+
+    // تفعيل تغيير الصور التلقائي
+    setTimeout(() => startImageSlider(key, images.length), 0); // تأخير لضمان تحميل الصور قبل بدء التبديل
+
+    return productCardHtml;
 }
+
+// وظيفة التنقل بين الصور يدويًا
+function changeImage(key, direction) {
+    const images = document.querySelectorAll(`#product-images-${key} .product-image`);
+    let currentIndex = Array.from(images).findIndex(img => img.classList.contains('active'));
+    images[currentIndex].classList.remove('active');  // إخفاء الصورة الحالية
+    currentIndex = (currentIndex + direction + images.length) % images.length;  // تحديث الفهرس مع التحقق من الدوران
+    images[currentIndex].classList.add('active');  // إظهار الصورة الجديدة
+}
+
+// وظيفة بدء تغيير الصور التلقائي
+function startImageSlider(key, totalImages) {
+    let currentIndex = 0;
+    setInterval(() => {
+        const images = document.querySelectorAll(`#product-images-${key} .product-image`);
+        images[currentIndex].classList.remove('active');  // إخفاء الصورة الحالية
+        currentIndex = (currentIndex + 1) % totalImages;  // الانتقال إلى الصورة التالية
+        images[currentIndex].classList.add('active');  // إظهار الصورة الجديدة
+    }, 5000);  // تغيير الصورة كل ثانيتين
+}
+
+
 
 // دالة جديدة لإرسال جميع معلومات المنتج إلى واتساب
 function sendToWhatsApp(productName, priceOriginal, priceDiscount, priceSuperDiscount, imageUrl) {

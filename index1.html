@@ -1600,6 +1600,69 @@ video {
     background-color: #218838;
 }
 
+.product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1);
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
+.product-image.active {
+    opacity: 1;
+    transform: scale(1.05); /* تكبير الصورة قليلاً عند الانتقال */
+}
+
+.image-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, opacity 0.3s ease;
+    opacity: 0;
+    z-index: 1;
+}
+
+.product-card:hover .image-nav {
+    opacity: 1;
+}
+
+.image-nav:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.image-nav.prev {
+    left: 0.5rem;
+}
+
+.image-nav.next {
+    right: 0.5rem;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.action-button:hover {
+    transform: scale(1.2); /* تكبير الأيقونة عند التمرير */
+}
+
+.action-count {
+    margin-left: 5px;
+    font-size: 0.9rem;
+}
 
     </style>
 </head>
@@ -2926,17 +2989,17 @@ window.onload = () => {
         // Update the createProductCard function to include the cart button
 function createProductCard(key, product) {
     const imagesHtml = product.images.map((img, index) => `
-        <img src="${img}" alt="${product.name}" class="product-image" style="opacity: ${index === 0 ? 1 : 0};" onclick="redirectToProductPage('${product.fileName}')">
+        <img src="${img}" alt="${product.name}" class="product-image ${index === 0 ? 'active' : ''}" id="image-${key}-${index}" onclick="redirectToProductPage('${product.fileName}')">
     `).join('');
 
-    return `
+    const productCardHtml = `
         <div class="product-card" data-product-id="${key}">
-            <div class="product-images">
+            <div class="product-images" id="product-images-${key}">
                 ${imagesHtml}
                 <button class="image-nav prev" onclick="changeImage('${key}', -1)">❮</button>
                 <button class="image-nav next" onclick="changeImage('${key}', 1)">❯</button>
             </div>
-            
+
             <div class="product-info">
                 <h3 style="color: var(--accent-color);">${product.name}</h3>
               
@@ -2961,7 +3024,33 @@ function createProductCard(key, product) {
             </div>
         </div>
     `;
+
+    // بدء التبديل التلقائي للصور
+    setTimeout(() => startImageSlider(key, product.images.length), 0); // تأخير لضمان تحميل الصور
+
+    return productCardHtml;
 }
+
+// وظيفة لتبديل الصور يدويًا عند الضغط على الزر
+function changeImage(key, direction) {
+    const images = document.querySelectorAll(`#product-images-${key} .product-image`);
+    let currentIndex = Array.from(images).findIndex(img => img.classList.contains('active'));
+    images[currentIndex].classList.remove('active');  // إخفاء الصورة الحالية
+    currentIndex = (currentIndex + direction + images.length) % images.length;  // الانتقال إلى الصورة التالية
+    images[currentIndex].classList.add('active');  // إظهار الصورة الجديدة
+}
+
+// بدء تبديل الصور تلقائيًا
+function startImageSlider(key, totalImages) {
+    let currentIndex = 0;
+    setInterval(() => {
+        const images = document.querySelectorAll(`#product-images-${key} .product-image`);
+        images[currentIndex].classList.remove('active');  // إخفاء الصورة الحالية
+        currentIndex = (currentIndex + 1) % totalImages;  // الانتقال إلى الصورة التالية
+        images[currentIndex].classList.add('active');  // إظهار الصورة الجديدة
+    }, 3000);  // تغيير الصورة كل 3 ثوانٍ
+}
+
 
 
 // دالة لإعادة التوجيه إلى صفحة المنتج
