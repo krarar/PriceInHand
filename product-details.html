@@ -2919,13 +2919,17 @@ window.onload = () => {
         // Update the fetchProducts function to also update the cart count
       
 function createProductCard(key, product) {
+    const formatPrice = (price) => {
+        return parseInt(price).toLocaleString() + ' د.ع';  // تنسيق السعر وإضافة "د.ع"
+    };
+
     const images = product.images || [product.image];
     const whatsappNumber = '9647813798636';  // رقم الواتساب الذي سيتم إرسال الرابط إليه
 
     // بناء HTML للصور
     const imagesHtml = images.map((img, index) => `
         <img src="${img}" alt="${product.name}" class="product-image ${index === 0 ? 'active' : ''}" id="image-${key}-${index}" 
-            onclick="sendToWhatsApp('${product.name}', '${product.priceOriginal}', '${product.priceDiscount}', '${product.priceSuperDiscount}', '${img}')">
+            onclick="sendToWhatsApp('${product.name}', '${formatPrice(product.priceOriginal)}', '${formatPrice(product.priceDiscount)}', '${formatPrice(product.priceSuperDiscount)}', '${img}')">
     `).join('');
 
     // التحقق مما إذا كان المنتج غير متوفر
@@ -2941,9 +2945,9 @@ function createProductCard(key, product) {
             </div>
             <div class="product-info">
                 <h3 style="color: white;">${product.name}</h3>
-                <p class="price">السعر الأصلي: $${product.priceOriginal}</p>
-                <p class="price">سعر الخصم: $${product.priceDiscount}</p>
-                <p class="price">سعر الخصم الفائق: $${product.priceSuperDiscount}</p>
+                <p class="price">السعر الأصلي: ${formatPrice(product.priceOriginal)}</p>
+                <p class="price">سعر الخصم: ${formatPrice(product.priceDiscount)}</p>
+                <p class="price">سعر الخصم الفائق: ${formatPrice(product.priceSuperDiscount)}</p>
                 <p class="stock" style="color: #ff5733; font-size: 1.0rem; font-weight: bold;">
                     الكمية المتوفرة: ${product.quantity}
                 </p>
@@ -2997,7 +3001,7 @@ function startImageSlider(key, totalImages) {
         images[currentIndex].classList.remove('active');  // إخفاء الصورة الحالية
         currentIndex = (currentIndex + 1) % totalImages;  // الانتقال إلى الصورة التالية
         images[currentIndex].classList.add('active');  // إظهار الصورة الجديدة
-    }, 5000);  // تغيير الصورة كل ثانيتين
+    }, 2000);  // تغيير الصورة كل ثانيتين
 }
 
 
@@ -3736,11 +3740,19 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
 
         </script>
     </main>
-   <script type="text/babel">
+  <script type="text/babel">
   const { useState, useEffect } = React;
 
-  const AdBanner = ({ adContent, targetUrl, title, description, onClose }) => {
-    const isVideo = adContent.endsWith('.mp4') || adContent.endsWith('.webm');
+  const AdBanner = ({ adImages, targetUrl, title, description, onClose }) => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    // تغيير الصورة كل 3 ثوانٍ
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % adImages.length);
+      }, 3000); // التبديل بين الصور كل 3 ثوانٍ
+      return () => clearInterval(interval);
+    }, [adImages]);
 
     return (
       <div style={{
@@ -3774,23 +3786,18 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
         </button>
 
         <div style={{ position: "relative", width: "100%", height: "100%" }}>
-          {/* محتوى الإعلان (صورة أو فيديو) */}
+          {/* محتوى الإعلان (شريط الصور المتحركة) */}
           <a href={targetUrl} style={{ textDecoration: "none", display: "block", width: "100%", height: "100%" }}>
-            {isVideo ? (
-              <video 
-                src={adContent} 
-                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-                controls 
-                autoPlay 
-                loop 
-              />
-            ) : (
-              <img 
-                src={adContent} 
-                alt="إعلان" 
-                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-              />
-            )}
+            <img 
+              src={adImages[currentImageIndex]} 
+              alt="إعلان" 
+              style={{
+                width: "100%", 
+                height: "100%", 
+                objectFit: "cover", 
+                transition: "opacity 1s ease-in-out"
+              }} 
+            />
           </a>
 
           {/* النصوص وزر "Next" في الأسفل */}
@@ -3870,10 +3877,10 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
 
     return (
       <AdBanner
-        adContent={currentAd.adImage}  // يمكن أن يكون فيديو أو صورة
+        adImages={currentAd.adImages}  // جلب مجموعة الصور من قاعدة البيانات
         targetUrl={currentAd.targetUrl}
-        title={currentAd.title}  // جلب العنوان من قاعدة البيانات
-        description={currentAd.description}  // جلب الوصف من قاعدة البيانات
+        title={currentAd.title}
+        description={currentAd.description}
         onClose={handleClose}
       />
     );
@@ -3881,4 +3888,5 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
 
   ReactDOM.render(<App />, document.getElementById("ad-banner"));
 </script>
+
 

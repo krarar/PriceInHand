@@ -105,8 +105,8 @@
             <label for="targetUrl">الرابط المستهدف:</label>
             <input type="url" id="targetUrl" placeholder="أدخل الرابط المستهدف" required>
 
-            <label for="adImage">صورة الإعلان (اختياري):</label>
-            <input type="file" id="adImage" accept="image/*">
+            <label for="adImages">صور الإعلان (اختياري - يمكنك اختيار أكثر من صورة):</label>
+            <input type="file" id="adImages" accept="image/*" multiple>
 
             <label for="adVideo">فيديو الإعلان (اختياري):</label>
             <input type="file" id="adVideo" accept="video/*">
@@ -138,7 +138,7 @@
             const title = document.getElementById('title').value;
             const description = document.getElementById('description').value;
             const targetUrl = document.getElementById('targetUrl').value;
-            const adImageFile = document.getElementById('adImage').files[0];
+            const adImagesFiles = document.getElementById('adImages').files;
             const adVideoFile = document.getElementById('adVideo').files[0];
 
             if (!title || !description || !targetUrl) {
@@ -147,14 +147,18 @@
             }
 
             try {
-                let adImageUrl = null;
+                let adImagesUrls = [];
                 let adVideoUrl = null;
 
-                // رفع الصورة إلى Firebase Storage إذا تم تحديدها
-                if (adImageFile) {
-                    const imageStorageRef = storage.ref('ads_images/' + adImageFile.name);
-                    await imageStorageRef.put(adImageFile);
-                    adImageUrl = await imageStorageRef.getDownloadURL();
+                // رفع الصور إلى Firebase Storage إذا تم تحديدها
+                if (adImagesFiles.length > 0) {
+                    for (let i = 0; i < adImagesFiles.length; i++) {
+                        const imageFile = adImagesFiles[i];
+                        const imageStorageRef = storage.ref('ads_images/' + imageFile.name);
+                        await imageStorageRef.put(imageFile);
+                        const imageUrl = await imageStorageRef.getDownloadURL();
+                        adImagesUrls.push(imageUrl);
+                    }
                 }
 
                 // رفع الفيديو إلى Firebase Storage إذا تم تحديده
@@ -169,9 +173,9 @@
                     title: title, // عنوان الإعلان
                     description: description, // وصف الإعلان
                     targetUrl: targetUrl,
-                    adImage: adImageUrl || null, // رابط الصورة
+                    adImages: adImagesUrls.length > 0 ? adImagesUrls : null, // روابط الصور
                     adVideo: adVideoUrl || null, // رابط الفيديو
-                    isVideo: !!adVideoUrl // تحدد إذا كان المحتوى فيديو أم صورة
+                    isVideo: !!adVideoUrl // تحدد إذا كان المحتوى فيديو أم صور
                 };
 
                 // استخدم push لإضافة الإعلان بمعرف فريد
