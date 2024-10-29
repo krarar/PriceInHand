@@ -3741,11 +3741,32 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
 </body>
 </html>
 
-<script type="text/babel">
+  <script type="text/babel">
   const { useState, useEffect } = React;
 
-  const AdBanner = ({ adContent, targetUrl, title, description, onClose }) => {
-    const isVideo = adContent.endsWith('.mp4') || adContent.endsWith('.webm');
+  const AdBanner = ({ adImages, targetUrl, title, description, onClose }) => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isImageVisible, setIsImageVisible] = useState(true);
+
+    // تغيير الصورة كل 3 ثوانٍ
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setIsImageVisible(false);
+        setTimeout(() => {
+          setCurrentImageIndex((prevIndex) => (prevIndex + 1) % adImages.length);
+          setIsImageVisible(true);
+        }, 500); // وقت الانتقال
+      }, 3000); // التبديل بين الصور كل 3 ثوانٍ
+      return () => clearInterval(interval);
+    }, [adImages]);
+
+    // دالة لنقل البيانات إلى WhatsApp
+    const handleImageClick = () => {
+      const phoneNumber = "9647813798636";
+      const message = `استعلام عن المنتج:\n\n${title}\n${description}\nصور:\n${adImages.join('\n')}`;
+      const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappLink, '_blank');
+    };
 
     return (
       <div style={{
@@ -3779,23 +3800,21 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
         </button>
 
         <div style={{ position: "relative", width: "100%", height: "100%" }}>
-          {/* محتوى الإعلان (صورة أو فيديو) */}
+          {/* محتوى الإعلان (شريط الصور المتحركة) */}
           <a href={targetUrl} style={{ textDecoration: "none", display: "block", width: "100%", height: "100%" }}>
-            {isVideo ? (
-              <video 
-                src={adContent} 
-                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-                controls 
-                autoPlay 
-                loop 
-              />
-            ) : (
-              <img 
-                src={adContent} 
-                alt="إعلان" 
-                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-              />
-            )}
+            <img 
+              src={adImages[currentImageIndex]} 
+              alt="إعلان" 
+              onClick={handleImageClick} // إضافة حدث النقر
+              style={{
+                width: "100%", 
+                height: "100%", 
+                objectFit: "cover", 
+                transition: "opacity 1s ease-in-out, transform 1s ease-in-out",
+                opacity: isImageVisible ? 1 : 0,
+                transform: isImageVisible ? "scale(1)" : "scale(1.05)"
+              }} 
+            />
           </a>
 
           {/* النصوص وزر "Next" في الأسفل */}
@@ -3875,10 +3894,10 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
 
     return (
       <AdBanner
-        adContent={currentAd.adImage}  // يمكن أن يكون فيديو أو صورة
+        adImages={currentAd.adImages}  // جلب مجموعة الصور من قاعدة البيانات
         targetUrl={currentAd.targetUrl}
-        title={currentAd.title}  // جلب العنوان من قاعدة البيانات
-        description={currentAd.description}  // جلب الوصف من قاعدة البيانات
+        title={currentAd.title}
+        description={currentAd.description}
         onClose={handleClose}
       />
     );
@@ -3886,3 +3905,5 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
 
   ReactDOM.render(<App />, document.getElementById("ad-banner"));
 </script>
+
+
