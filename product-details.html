@@ -763,7 +763,7 @@ padding: 10px 30px; /* تعديل القيم لزيادة أو تقليل الم
     }
 }
 
-@media screen and (max-width: 880px) {
+@media screen and (max-width:750px) {
     .products {
         grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
         gap: 0.6rem;
@@ -1516,6 +1516,24 @@ video {
     transform: scale(1.05); /* تكبير الصورة قليلاً عند الانتقال */
 }
 
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px 0;
+    background-color: rgba(0, 0, 0, 0.5); /* خلفية شفافة */
+    border-radius: 0 0 8px 8px;
+}
+
+.social-icons .icon {
+    color: white;
+    font-size: 1.5rem;
+    transition: color 0.3s;
+}
+
+.social-icons .icon:hover {
+    color: #4caf50; /* لون مميز عند التمرير */
+}
 
     </style>
 </head>
@@ -1533,7 +1551,7 @@ video {
                 <button class="header-button dark-mode-toggle" onclick="toggleDarkMode()">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button class="header-button language-toggle" onclick="toggleLanguage()">EN</button>
+               
                 
             </div>
        <!-- قائمة التصنيفات مع التحسينات -->
@@ -1857,75 +1875,93 @@ if (openCount > 5) {
 }
 
     // إنشاء معرف فريد لكل مستخدم
-    let userId = localStorage.getItem('userId');
-    if (!userId) {
-        userId = 'user_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('userId', userId);
-        // حفظ المعرف في Firebase
-        firebase.database().ref('users/' + userId).set({ id: userId });
-    }
+  // إنشاء معرف فريد لكل مستخدم
+let userId = localStorage.getItem('userId');
+if (!userId) {
+    userId = 'user_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('userId', userId);
+    // حفظ المعرف في Firebase
+    firebase.database().ref('users/' + userId).set({ id: userId });
+}
 
-    // توليد رقم عشوائي ثابت إذا لم يكن موجودًا بالفعل في قاعدة البيانات
-    function generateAndSaveRandomCode() {
-        firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
-            const data = snapshot.val();
-            if (!data.randomCode) {
-                // إذا لم يكن الرمز العشوائي موجودًا، أنشئ رمزًا جديدًا واحفظه
-                const randomCode = Math.floor(100000 + Math.random() * 900000); // إنشاء رقم مكون من 6 أرقام عشوائية
-                firebase.database().ref('users/' + userId).update({ randomCode: randomCode });
-            }
-        });
-    }
-
-    // إرسال رسالة ترحيب فقط عبر واتساب عند النقر على زر "التواصل مع المسؤول"
-    function contactAdmin() {
-        // استدعاء دالة إنشاء وحفظ الرمز العشوائي إذا لم يكن موجودًا
-        generateAndSaveRandomCode();
-
-        // إرسال رسالة ترحيب فقط إلى المسؤول عبر واتساب
-        const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
-        const message = `مرحبًا!    .   .`;
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        window.location.href = whatsappUrl; // فتح رابط واتساب وإرسال الرسالة
-    }
-
-    // إظهار النافذة المنبثقة لطلب الرمز التعريفي
-    function showPopup() {
-        // تحقق مما إذا تم إدخال الرمز مسبقًا
-        if (!localStorage.getItem('isCodeVerified')) {
-            document.getElementById('popup').style.display = 'block';
+// توليد رقم عشوائي ثابت إذا لم يكن موجودًا بالفعل في قاعدة البيانات
+function generateAndSaveRandomCode() {
+    firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
+        const data = snapshot.val();
+        if (!data || !data.randomCode) {
+            // إذا لم يكن الرمز العشوائي موجودًا، أنشئ رمزًا جديدًا واحفظه
+            const randomCode = Math.floor(100000 + Math.random() * 900000); // إنشاء رقم مكون من 6 أرقام عشوائية
+            firebase.database().ref('users/' + userId).update({ randomCode: randomCode }, function(error) {
+                if (error) {
+                    console.error('Error saving code:', error);
+                } else {
+                    console.log('Code saved successfully');
+                    verifyCodeSavedAndRedirect(randomCode);
+                }
+            });
+        } else {
+            // إذا كان الرمز موجودًا بالفعل، توجه مباشرة إلى WhatsApp
+            verifyCodeSavedAndRedirect(data.randomCode);
         }
+    });
+}
+
+// التأكد من حفظ الرمز العشوائي قبل التوجيه إلى WhatsApp
+function verifyCodeSavedAndRedirect(savedCode) {
+    if (savedCode) {
+        // توجه إلى WhatsApp بعد حفظ الرمز
+        const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
+        const message = `مرحبًا! الرمز الخاص بك هو: ${savedCode}`;
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.location.href = whatsappUrl;
+    } else {
+        console.error('Code not saved');
     }
+}
 
-    // التحقق من الرمز التعريفي الذي تم إدخاله من قاعدة البيانات
-    function verifyCode() {
-        const enteredCode = document.getElementById('userCode').value;
+// إرسال رسالة ترحيب فقط عبر واتساب عند النقر على زر "التواصل مع المسؤول"
+function contactAdmin() {
+    // استدعاء دالة إنشاء وحفظ الرمز العشوائي إذا لم يكن موجودًا
+    generateAndSaveRandomCode();
+}
 
-        // التحقق من الرمز العشوائي من قاعدة بيانات Firebase
-        firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
-            const storedRandomCode = snapshot.val().randomCode;
-
-            // التحقق من الرمز المدخل
-            if (enteredCode === storedRandomCode.toString()) {
-                alert('تم التحقق بنجاح! يمكنك المتابعة.');
-                document.getElementById('popup').style.display = 'none'; // إخفاء النافذة المنبثقة
-                localStorage.setItem('isCodeVerified', true); // تخزين الحالة كتم التحقق
-                openApp(); // فتح التطبيق بصورة طبيعية
-            } else {
-                alert('الرمز غير صحيح. حاول مرة أخرى.');
-            }
-        });
+// إظهار النافذة المنبثقة لطلب الرمز التعريفي
+function showPopup() {
+    // تحقق مما إذا تم إدخال الرمز مسبقًا
+    if (!localStorage.getItem('isCodeVerified')) {
+        document.getElementById('popup').style.display = 'block';
     }
+}
 
-    // فتح التطبيق بعد التحقق
-    function openApp() {
-        // هنا يمكنك تنفيذ ما تراه مناسبًا لفتح التطبيق بشكل طبيعي
-        // على سبيل المثال: إعادة توجيه المستخدم إلى الصفحة الرئيسية أو إزالة القيود
-        window.location.href = 'product-details.html'; // إعادة توجيه المستخدم إلى الصفحة الرئيسية
-    }
+// التحقق من الرمز التعريفي الذي تم إدخاله من قاعدة البيانات
+function verifyCode() {
+    const enteredCode = document.getElementById('userCode').value;
 
-    // عرض النافذة المنبثقة إذا كانت الحالة غير متحققة
-    showPopup();
+    // التحقق من الرمز العشوائي من قاعدة بيانات Firebase
+    firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
+        const storedRandomCode = snapshot.val().randomCode;
+
+        // التحقق من الرمز المدخل
+        if (enteredCode === storedRandomCode.toString()) {
+            alert('تم التحقق بنجاح! يمكنك المتابعة.');
+            document.getElementById('popup').style.display = 'none'; // إخفاء النافذة المنبثقة
+            localStorage.setItem('isCodeVerified', true); // تخزين الحالة كتم التحقق
+            openApp(); // فتح التطبيق بصورة طبيعية
+        } else {
+            alert('الرمز غير صحيح. حاول مرة أخرى.');
+        }
+    });
+}
+
+// فتح التطبيق بعد التحقق
+function openApp() {
+    // هنا يمكنك تنفيذ ما تراه مناسبًا لفتح التطبيق بشكل طبيعي
+    // على سبيل المثال: إعادة توجيه المستخدم إلى الصفحة الرئيسية أو إزالة القيود
+    window.location.href = 'product-details.html'; // إعادة توجيه المستخدم إلى الصفحة الرئيسية
+}
+
+// عرض النافذة المنبثقة إذا كانت الحالة غير متحققة
+showPopup();
 
 
 
@@ -2937,7 +2973,7 @@ function createProductCard(key, product) {
 
     // بناء بطاقة المنتج
     const productCardHtml = `
-        <div class="product-card" data-product-id="${key}">
+        <div class="product-card" data-product-id="${key}" onclick="showProductDetails('${key}', ${JSON.stringify(product)})">
             <div class="product-images" id="product-images-${key}">
                 ${imagesHtml}
                 <button class="image-nav prev" onclick="changeImage('${key}', -1)">❮</button>
@@ -2983,6 +3019,204 @@ function createProductCard(key, product) {
 
     return productCardHtml;
 }
+function createProductCard(key, product) {
+    const formatPrice = (price) => {
+        return parseInt(price).toLocaleString() + ' د.ع';  // تنسيق السعر وإضافة "د.ع"
+    };
+
+    const images = product.images || [product.image];
+    const whatsappNumber = '9647813798636';  // رقم الواتساب الذي سيتم إرسال الرابط إليه
+
+    // بناء HTML للصور
+    const imagesHtml = images.map((img, index) => `
+        <img src="${img}" alt="${product.name}" class="product-image ${index === 0 ? 'active' : ''}" id="image-${key}-${index}" 
+            onclick="sendToWhatsApp('${product.name}', '${formatPrice(product.priceOriginal)}', '${formatPrice(product.priceDiscount)}', '${formatPrice(product.priceSuperDiscount)}', '${img}')">
+    `).join('');
+
+    // التحقق مما إذا كان المنتج غير متوفر
+    const isOutOfStock = product.quantity <= 0;
+
+    // بناء بطاقة المنتج
+    const productCardHtml = `
+        <div class="product-card" data-product-id="${key}" onclick="showProductDetails('${key}', ${JSON.stringify(product)})">
+            <div class="product-images" id="product-images-${key}">
+                ${imagesHtml}
+                <button class="image-nav prev" onclick="changeImage('${key}', -1)">❮</button>
+                <button class="image-nav next" onclick="changeImage('${key}', 1)">❯</button>
+            </div>
+            <div class="product-info">
+                <h3 style="color: white;">${product.name}</h3>
+                <p class="price">السعر الأصلي: ${formatPrice(product.priceOriginal)}</p>
+                <p class="price">سعر الخصم: ${formatPrice(product.priceDiscount)}</p>
+                <p class="price">سعر الخصم الفائق: ${formatPrice(product.priceSuperDiscount)}</p>
+                <p class="stock" style="color: #ff5733; font-size: 1.0rem; font-weight: bold;">
+                    الكمية المتوفرة: ${product.quantity}
+                </p>
+
+                <div class="action-buttons">
+                    <button class="action-button" onclick="toggleLike('${key}')">
+                        <i class="fas fa-heart ${product.likes && product.likes[userId] ? 'text-danger' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.likes)}</span>
+                    </button>
+                    <button class="action-button" onclick="toggleFavorite('${key}')">
+                        <i class="fas fa-star ${product.favorites && product.favorites[userId] ? 'text-warning' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.favorites)}</span>
+                    </button>
+                    <button class="action-button" onclick="toggleSave('${key}')">
+                        <i class="fas fa-bookmark ${product.saved && product.saved[userId] ? 'text-primary' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.saved)}</span>
+                    </button>
+                    <button class="action-button" onclick="toggleCart('${key}')">
+                        <i class="fas fa-shopping-cart ${product.cart && product.cart[userId] ? 'text-success' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.cart)}</span>
+                    </button>
+                </div>
+
+                <button class="buy-button" ${isOutOfStock ? 'style="display:none;"' : ''} onclick="addToCartDirectly('${key}')">
+                    شراء الآن
+                </button>
+            </div>
+        </div>
+    `;
+
+    return productCardHtml;
+}
+
+// دالة لإضافة المنتج إلى السلة مباشرة عند الضغط على زر "شراء الآن"
+function addToCartDirectly(productId) {
+    // منطق إضافة المنتج إلى السلة
+    alert('تمت إضافة المنتج إلى السلة بنجاح!');
+    // يمكنك هنا تحديث حالة السلة أو العدادات كما تريد
+    updateCartCount();
+}
+
+// دالة لتحديث عداد السلة
+function updateCartCount() {
+    // منطق تحديث عداد السلة، على سبيل المثال جلب عدد المنتجات في السلة وتحديث العرض
+    const cartCountElement = document.getElementById('cartCount');
+    const currentCount = parseInt(cartCountElement.textContent) || 0;
+    cartCountElement.textContent = currentCount + 1;
+}
+
+function createProductCard(key, product) {
+    const formatPrice = (price) => {
+        return parseInt(price).toLocaleString() + ' د.ع';  // تنسيق السعر وإضافة "د.ع"
+    };
+
+    const images = product.images || [product.image];
+    const whatsappNumber = '9647813798636';  // رقم الواتساب الذي سيتم إرسال الرابط إليه
+
+    // بناء HTML للصور
+    const imagesHtml = images.map((img, index) => `
+        <img src="${img}" alt="${product.name}" class="product-image ${index === 0 ? 'active' : ''}" id="image-${key}-${index}" 
+            onclick="sendToWhatsApp('${product.name}', '${formatPrice(product.priceOriginal)}', '${formatPrice(product.priceDiscount)}', '${formatPrice(product.priceSuperDiscount)}', '${img}')">
+    `).join('');
+
+    // التحقق مما إذا كان المنتج غير متوفر
+    const isOutOfStock = product.quantity <= 0;
+
+    // HTML للأيقونات الاجتماعية
+    const socialIconsHtml = `
+        <div class="social-icons">
+            <a href="https://wa.me/${whatsappNumber}" target="_blank" class="icon whatsapp-icon">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="icon facebook-icon">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://www.instagram.com" target="_blank" class="icon instagram-icon">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="mailto:your-email@example.com" target="_blank" class="icon email-icon">
+                <i class="fas fa-envelope"></i>
+            </a>
+        </div>
+    `;
+
+    // بناء بطاقة المنتج
+    const productCardHtml = `
+        <div class="product-card" data-product-id="${key}" onclick="showProductDetails('${key}', ${JSON.stringify(product)})">
+            <div class="product-images" id="product-images-${key}">
+                ${imagesHtml}
+                <button class="image-nav prev" onclick="changeImage('${key}', -1)">❮</button>
+                <button class="image-nav next" onclick="changeImage('${key}', 1)">❯</button>
+            </div>
+            ${socialIconsHtml} <!-- إضافة الأيقونات هنا -->
+            <div class="product-info">
+                <h3 style="color: white;">${product.name}</h3>
+                <p class="price">السعر الأصلي: ${formatPrice(product.priceOriginal)}</p>
+                <p class="price">سعر الخصم: ${formatPrice(product.priceDiscount)}</p>
+                <p class="price">سعر الخصم الفائق: ${formatPrice(product.priceSuperDiscount)}</p>
+                <p class="stock" style="color: #ff5733; font-size: 1.0rem; font-weight: bold;">
+                    الكمية المتوفرة: ${product.quantity}
+                </p>
+
+                <div class="action-buttons">
+                    <button class="action-button" onclick="toggleLike('${key}')">
+                        <i class="fas fa-heart ${product.likes && product.likes[userId] ? 'text-danger' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.likes)}</span>
+                    </button>
+                    <button class="action-button" onclick="toggleFavorite('${key}')">
+                        <i class="fas fa-star ${product.favorites && product.favorites[userId] ? 'text-warning' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.favorites)}</span>
+                    </button>
+                    <button class="action-button" onclick="toggleSave('${key}')">
+                        <i class="fas fa-bookmark ${product.saved && product.saved[userId] ? 'text-primary' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.saved)}</span>
+                    </button>
+                    <button class="action-button" onclick="toggleCart('${key}')">
+                        <i class="fas fa-shopping-cart ${product.cart && product.cart[userId] ? 'text-success' : ''}"></i>
+                        <span class="action-count">${countObjectProperties(product.cart)}</span>
+                    </button>
+                </div>
+
+                <button class="buy-button" ${isOutOfStock ? 'style="display:none;"' : ''} onclick="showPricePopup('${key}')">
+                    شراء الآن
+                </button>
+            </div>
+        </div>
+    `;
+
+    return productCardHtml;
+}
+
+// عرض تفاصيل المنتج في نفس الصفحة عند النقر على البطاقة
+function showProductDetails(key, product) {
+    const productDetailsContainer = document.getElementById('productDetailsContainer');
+    const additionalImagesDiv = document.getElementById('additionalImages');
+    
+    // عرض التفاصيل في المكان المحدد
+    document.getElementById('productDetailName').textContent = product.name;
+    document.getElementById('productDetailPrice').textContent = 'السعر: ' + parseInt(product.priceOriginal).toLocaleString() + ' د.ع';
+    document.getElementById('productDetailDescription').textContent = product.description;
+    document.getElementById('productDetailImage').src = product.image;
+
+    // إظهار الصور الإضافية إن وجدت
+    additionalImagesDiv.innerHTML = '';
+    product.images.forEach(img => {
+        const imgElement = document.createElement('img');
+        imgElement.src = img;
+        imgElement.classList.add('product-image');
+        imgElement.onclick = () => enlargeImage(img);
+        additionalImagesDiv.appendChild(imgElement);
+    });
+
+    // إظهار قسم التفاصيل
+    productDetailsContainer.style.display = 'block';
+}
+
+// تكبير الصورة في نافذة منبثقة
+function enlargeImage(imgSrc) {
+    const modal = document.getElementById("imageModal");
+    const enlargedImage = document.getElementById("enlargedImage");
+    modal.style.display = "block";
+    enlargedImage.src = imgSrc;
+}
+
+// إغلاق النافذة المنبثقة
+function closeModal() {
+    document.getElementById("imageModal").style.display = "none";
+}
 
 // وظيفة التنقل بين الصور يدويًا
 function changeImage(key, direction) {
@@ -3004,40 +3238,18 @@ function startImageSlider(key, totalImages) {
     }, 2000);  // تغيير الصورة كل ثانيتين
 }
 
-
-
-// دالة جديدة لإرسال جميع معلومات المنتج إلى واتساب
+// دالة إرسال المعلومات إلى واتساب
 function sendToWhatsApp(productName, priceOriginal, priceDiscount, priceSuperDiscount, imageUrl) {
-    const whatsappNumber = '9647813798636';  // رقم الواتساب
+    const whatsappNumber = '9647813798636';  
     const message = `أرغب في الاستعلام عن هذا المنتج:\n\n` +
                     `اسم المنتج: ${productName}\n` +
-                    `السعر الأصلي: $${priceOriginal}\n` +
-                    `سعر الخصم: $${priceDiscount}\n` +
-                    `سعر الخصم الفائق: $${priceSuperDiscount}\n` +
+                    `السعر الأصلي: ${priceOriginal}\n` +
+                    `سعر الخصم: ${priceDiscount}\n` +
+                    `سعر الخصم الفائق: ${priceSuperDiscount}\n` +
                     `صورة المنتج: ${imageUrl}\n` + 
                     `لمزيد من المعلومات، الرجاء الاتصال بي.`;
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.location.href = whatsappUrl;  // فتح رابط واتساب
-}
-
-
-// دالة لإعادة التوجيه إلى صفحة المنتج
-function redirectToProductPage(fileName) {
-    if (fileName) {
-        window.location.href = fileName; // الانتقال إلى صفحة HTML المرتبطة بالمنتج
-    } else {
-        alert('لا يوجد ملف مرتبط بهذا المنتج.');
-    }
-}
-
-
-// دالة لإعادة التوجيه إلى صفحة المنتج
-function redirectToProductPage(fileName) {
-    if (fileName) {
-        window.location.href = fileName; // الانتقال إلى صفحة HTML المرتبطة بالمنتج
-    } else {
-        alert('لا يوجد ملف مرتبط بهذا المنتج.');
-    }
+    window.location.href = whatsappUrl;
 }
 
 
