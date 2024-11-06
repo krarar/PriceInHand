@@ -1896,27 +1896,23 @@ function generateAndSaveRandomCode() {
                     console.error('Error saving code:', error);
                 } else {
                     console.log('Code saved successfully');
-                    verifyCodeSavedAndRedirect(randomCode);
+                    sendWelcomeMessage(); // إرسال رسالة ترحيب فقط
                 }
             });
         } else {
-            // إذا كان الرمز موجودًا بالفعل، توجه مباشرة إلى WhatsApp
-            verifyCodeSavedAndRedirect(data.randomCode);
+            // إذا كان الرمز موجودًا بالفعل، توجه مباشرة لإرسال رسالة ترحيب
+            sendWelcomeMessage();
         }
     });
 }
 
-// التأكد من حفظ الرمز العشوائي قبل التوجيه إلى WhatsApp
-function verifyCodeSavedAndRedirect(savedCode) {
-    if (savedCode) {
-        // توجه إلى WhatsApp بعد حفظ الرمز
-        const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
-        const message = `مرحبًا! الرمز الخاص بك هو: ${savedCode}`;
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        window.location.href = whatsappUrl;
-    } else {
-        console.error('Code not saved');
-    }
+// إرسال رسالة ترحيب عبر WhatsApp دون عرض الرمز
+function sendWelcomeMessage() {
+    // توجه إلى WhatsApp بعد حفظ الرمز
+    const whatsappNumber = '9647813798636'; // رقم واتساب المسؤول
+    const message = `مرحبًا! شكرًا لتواصلك معنا. سيتم التواصل معك قريبًا.`; // رسالة الترحيب
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    window.location.href = whatsappUrl;
 }
 
 // إرسال رسالة ترحيب فقط عبر واتساب عند النقر على زر "التواصل مع المسؤول"
