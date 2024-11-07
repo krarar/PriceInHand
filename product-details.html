@@ -1535,6 +1535,11 @@ video {
     color: #4caf50; /* لون مميز عند التمرير */
 }
 
+.dark-mode-toggle i {
+    color: #2E1A47; /* استبدل #FFD700 بأي كود لون تريده */
+}
+
+
     </style>
 </head>
 <body>
@@ -1547,10 +1552,7 @@ video {
                     <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
                     <input type="text" id="searchInput" placeholder="البحث عن المنتجات...">
                 </div>
-                <div id="ad-banner"></div>
-                <button class="header-button dark-mode-toggle" onclick="toggleDarkMode()">
-                    <i class="fas fa-moon"></i>
-                </button>
+              
                
                 
             </div>
@@ -1757,6 +1759,8 @@ video {
     <!-- سيُضاف الستوري هنا ديناميكيًا -->
 </div>
 
+
+
 <!-- Button to show the form for adding a new story -->
 
 
@@ -1813,27 +1817,25 @@ video {
     
     
 </button>
-
 <!-- قائمة الأزرار المنبثقة -->
 <div id="popupMenu" class="popup-menu">
   <!-- أيقونات القائمة -->
-  <button class="menu-item" onclick="openAdPopup()">
-    <i class="fas fa-bullhorn"></i>
-  </button>
-
+  
   <button class="menu-item" onclick="redirectToCartPage()">
     <i class="fas fa-shopping-cart"></i>
     <span class="cart-count" id="cartCount">0</span>
   </button>
+  <div id="ad-banner"></div>
+              <button class="header-button dark-mode-toggle" onclick="toggleDarkMode()">
+    <i class="fas fa-lightbulb"></i>
+</button>
 
-  <button class="menu-item" onclick="toggleAddProductForm()">
-    <i class="fas fa-box"></i>
-  </button>
 
   <button class="menu-item" onclick="redirectToMessagesPage()">
     <i class="fas fa-envelope"></i>
     <span id="messageCount" 
 </div>
+
 
 
     
@@ -4094,7 +4096,7 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
     };
 
     if (ads.length === 0 || !isVisible) {
-      return <div style={{ textAlign: "center", marginTop: "20%" }}>Loading Ads...</div>;
+      return <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
     }
 
     const currentAd = ads[currentAdIndex];
