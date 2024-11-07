@@ -1535,10 +1535,10 @@ video {
     color: #4caf50; /* لون مميز عند التمرير */
 }
 
-.dark-mode-toggle i {
-    color: #2E1A47; /* استبدل #FFD700 بأي كود لون تريده */
-}
 
+.dark-mode-toggle i {
+    color: #2C3E50; /* استبدل #FFD700 بأي كود لون تريده */
+}
 
     </style>
 </head>
@@ -1552,8 +1552,8 @@ video {
                     <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
                     <input type="text" id="searchInput" placeholder="البحث عن المنتجات...">
                 </div>
-              
-               
+                <div id="ad-banner"></div>
+ 
                 
             </div>
        <!-- قائمة التصنيفات مع التحسينات -->
@@ -1665,11 +1665,11 @@ video {
         </a>
         <a href="#" onclick="showCategories()" class="nav-item">
             <i class="fas fa-list"></i>
-            <span>التصنيفات</span>
+            <span>الطلابات</span>
         </a>
-        <a href="صفحه اضافه الاعلان.html" onclick="showOffers()" class="nav-item">
+        <a href="#" onclick="showOffers()" class="nav-item">
             <i class="fas fa-percentage"></i>
-            <span>العروض</span>
+            <span>اضافة اعلان</span>
         </a>
     </div>
     
@@ -1759,7 +1759,7 @@ video {
     <!-- سيُضاف الستوري هنا ديناميكيًا -->
 </div>
 
-
+<!--  <button id="add-story-button" class="add-story-button" onclick="toggleStoryForm()">+ Add Story</button>
 
 <!-- Button to show the form for adding a new story -->
 
@@ -1810,32 +1810,36 @@ video {
 </body>
                     
    <!-- الزر الرئيسي المنبثق (أيقونة الإضافة) -->
-<button class="popup-toggle" onclick="toggleMenu()">
-<i class="fas fa-plus"></i>
 
-  </button>
+<button class="popup-toggle" onclick="toggleMenu()">
+    <i class="fas fa-plus"></i>
+    <span class="cart-count" id="cartCountMain">0</span> <!-- إشعار العدد -->
+</button>
+
     
     
 </button>
+
 <!-- قائمة الأزرار المنبثقة -->
 <div id="popupMenu" class="popup-menu">
   <!-- أيقونات القائمة -->
-  
+  <button class="menu-item" 
+<button class="menu-item" onclick="toggleLanguage()">
+    <i class="fas fa-globe"></i> <!-- أيقونة الكرة الأرضية لتغيير اللغة -->
+</button>
+<button class="header-button dark-mode-toggle" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i>
+                </button>
   <button class="menu-item" onclick="redirectToCartPage()">
     <i class="fas fa-shopping-cart"></i>
     <span class="cart-count" id="cartCount">0</span>
   </button>
-  <div id="ad-banner"></div>
-              <button class="header-button dark-mode-toggle" onclick="toggleDarkMode()">
-    <i class="fas fa-lightbulb"></i>
-</button>
 
 
   <button class="menu-item" onclick="redirectToMessagesPage()">
     <i class="fas fa-envelope"></i>
     <span id="messageCount" 
 </div>
-
 
 
     

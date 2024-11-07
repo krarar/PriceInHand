@@ -1664,6 +1664,13 @@ video {
     font-size: 0.9rem;
 }
 
+
+
+.dark-mode-toggle i {
+    color: #2C3E50; /* استبدل #FFD700 بأي كود لون تريده */
+}
+
+
     </style>
 </head>
 <body>
@@ -1677,10 +1684,8 @@ video {
                     <input type="text" id="searchInput" placeholder="البحث عن المنتجات...">
                 </div>
                 <div id="ad-banner"></div>
-                <button class="header-button dark-mode-toggle" onclick="toggleDarkMode()">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button class="header-button language-toggle" onclick="toggleLanguage()">EN</button>
+                
+                
                 
             </div>
        <!-- قائمة التصنيفات مع التحسينات -->
@@ -1789,11 +1794,11 @@ video {
             <i class="fas fa-bookmark"></i>
             <span>المحفوظات</span>
         </a>
-        <a href="#" onclick="showCategories()" class="nav-item">
+        <a href="orders-management-page.html" onclick="showCategories()" class="nav-item">
             <i class="fas fa-list"></i>
             <span>التصنيفات</span>
         </a>
-        <a href="#" onclick="showOffers()" class="nav-item">
+        <a href="صفحه اضافه الاعلان.html" onclick="showOffers()" class="nav-item">
             <i class="fas fa-percentage"></i>
             <span>العروض</span>
         </a>
@@ -1936,6 +1941,7 @@ video {
 </body>
                     
    <!-- الزر الرئيسي المنبثق (أيقونة الإضافة) -->
+
 <button class="popup-toggle" onclick="toggleMenu()">
     <i class="fas fa-plus"></i>
     <span class="cart-count" id="cartCountMain">0</span> <!-- إشعار العدد -->
@@ -1948,7 +1954,13 @@ video {
 <!-- قائمة الأزرار المنبثقة -->
 <div id="popupMenu" class="popup-menu">
   <!-- أيقونات القائمة -->
-  
+  <button class="menu-item" 
+<button class="menu-item" onclick="toggleLanguage()">
+    <i class="fas fa-globe"></i> <!-- أيقونة الكرة الأرضية لتغيير اللغة -->
+</button>
+<button class="header-button dark-mode-toggle" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i>
+                </button>
   <button class="menu-item" onclick="redirectToCartPage()">
     <i class="fas fa-shopping-cart"></i>
     <span class="cart-count" id="cartCount">0</span>
@@ -1959,7 +1971,6 @@ video {
     <i class="fas fa-envelope"></i>
     <span id="messageCount" 
 </div>
-
 
     
         
@@ -3881,7 +3892,7 @@ setInterval(showNextImage, 3000); // تغيير الصورة كل 3 ثواني
     };
 
     if (ads.length === 0 || !isVisible) {
-      return <div style={{ textAlign: "center", marginTop: "20%" }}>Loading Ads...</div>;
+      return <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
     }
 
     const currentAd = ads[currentAdIndex];
